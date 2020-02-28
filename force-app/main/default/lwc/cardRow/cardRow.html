@@ -1,0 +1,11 @@
+<template>
+    <div class="slds-scrollable_y" style="height:34.5rem;width:auto">
+    <lightning-card  title={cardrowname} icon-name="custom:custom13">
+        <template iterator:it={cards}>
+            <c-card  key={it.value} cardname = "{it.index}"></c-card>
+        </template>
+        <c-add-card-button cardrow = {cardrowname} onaddcardclick={handleButtonClick}></c-add-card-button>
+
+    </lightning-card>
+        </div>
+</template>

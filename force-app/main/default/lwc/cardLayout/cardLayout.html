@@ -1,0 +1,14 @@
+<template>
+    <div class="slds-scrollable_x" style="height:auto;width:240rem">
+        <lightning-layout>
+            <template iterator:it={cardRows}>
+                <lightning-layout-item size="3" class="slds-p-around_x-small" key={it.value}>
+
+                    <c-card-row  cardrowname={it.index}></c-card-row>
+
+                </lightning-layout-item>
+            </template>
+            <c-card-row-button onaddcardrowclick={handleRowButtonClick}></c-card-row-button>
+        </lightning-layout>
+    </div>
+</template>

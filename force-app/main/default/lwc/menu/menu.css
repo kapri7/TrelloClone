@@ -1,0 +1,18 @@
+hr {
+    opacity: 0.6;
+    width: 90%;
+    height: 0.5px;
+    border: 0 none;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 10px;
+    margin-bottom:10px;
+    background-color:#555;
+}
+
+h2{
+    margin-left: 20px
+}
+p{
+    margin-left: 20px
+}
