@@ -6,20 +6,28 @@ import { registerListener, unregisterAllListeners } from "c/pubsub";
 class ActionLogCardItem {
 
 
-  constructor(date, message, id,cardRowNumber) {
+  constructor(date, message, name, cardRowNumber) {
     this.date = date;
     this.message = message;
-    this.cardRowNumber =  cardRowNumber;
-    this.id = id;
+    this.cardRowName = cardRowNumber;
+    this.name = name;
   }
 }
 
 class ActionLogCardRowItem {
 
-  constructor(date, message, id) {
+  constructor(date, message, name) {
     this.date = date;
     this.message = message;
-    this.id = id;
+    this.name = name;
+  }
+}
+
+class DeletedActionLogCardItem {
+
+  constructor(date, message) {
+    this.date = date;
+    this.message = message;
   }
 }
 
@@ -53,39 +61,37 @@ export default class HelloWebComponent extends LightningElement {
   connectedCallback() {
     registerListener("addcardclick", this.handleAddCardClick, this);
     registerListener("addcardrowclick", this.handleAddCardRowClick, this);
+    registerListener("deletecardclick", this.handleDeleteCardClick, this);
+    registerListener("deleterow", this.handleDeleteRow, this);
   }
 
   disconnectedCallback() {
     unregisterAllListeners(this);
   }
 
-  handleAddCardClick(cardRow) {
-    let id = 0;
-    if (this.actions.length > 0) {
-      for (let i of this.actions) {
-        if (i instanceof ActionLogCardItem && i.cardRowNumber === cardRow) {
-          id = i.id + 1;
-          break;
-        }
-      }
-    }
-    let actionLogItem = new ActionLogCardItem(this.getDate(), "New card" + id + " at cardRow " + cardRow + " !", id,cardRow);
+  handleAddCardClick(cardInfo) {
+    let message = "User *username* added new card " + cardInfo.cardName + " at cardRow " + cardInfo.cardRow + " !";
+    let actionLogItem = new ActionLogCardItem(this.getDate(), message, cardInfo.cardName, cardInfo.cardRow);
     this.actions.unshift(actionLogItem);
 
 
   }
 
-  handleAddCardRowClick() {
-    let id = 0;
-    if (this.actions.length > 0) {
-      for (let i of this.actions) {
-        if (i instanceof ActionLogCardRowItem) {
-          id = i.id + 1;
-          break;
-        }
-      }
-    }
-    let actionLogItem = new ActionLogCardRowItem(this.getDate(), "New cardRow " + id + "!", id);
+  handleAddCardRowClick(cardRowName) {
+    let message = "User *username* added new cardRow " + cardRowName + "!";
+    let actionLogItem = new ActionLogCardRowItem(this.getDate(), message, cardRowName);
+    this.actions.unshift(actionLogItem);
+  }
+
+  handleDeleteCardClick(cardInfo) {
+    let message = "User *username* deleted card " + cardInfo.cardName + " at cardRow " + cardInfo.cardRow + "!";
+    let actionLogItem = new DeletedActionLogCardItem(this.getDate(), message);
+    this.actions.unshift(actionLogItem);
+  }
+
+  handleDeleteRow(cardRowName) {
+    let message = "User *username* deleted cardRow " + cardRowName + "!";
+    let actionLogItem = new DeletedActionLogCardItem(this.getDate(), message);
     this.actions.unshift(actionLogItem);
   }
 }

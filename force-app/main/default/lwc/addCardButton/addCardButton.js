@@ -7,13 +7,13 @@ import { CurrentPageReference } from 'lightning/navigation';
 import { fireEvent } from 'c/pubsub';
 
 export default class AddCardButton extends LightningElement {
-  @wire(CurrentPageReference) pageRef;
+ // @wire(CurrentPageReference) pageRef;
   @api cardrow;
   addCardClick() {
     const event = new CustomEvent('addcardclick', {
       //detail: this.cards
     });
     this.dispatchEvent(event);
-    fireEvent(this.pageRef, 'addcardclick',this.cardrow);
+    //fireEvent(this.pageRef, 'addcardclick',this.cardrow);
   }
 }

@@ -1,8 +1,12 @@
 <template>
-        <div class="slds-m-around_medium">
+    <lightning-layout class="slds-m-around_medium">
+        <lightning-layout-item>
             <lightning-input
-                    label={cardname}
-                    value="Card"
+                    value={cardname}
             ></lightning-input>
-        </div>
+        </lightning-layout-item>
+        <lightning-layout-item>
+        <lightning-button class = "slds-m-left_x-small" variant="destructive" label="" title="Delete card" icon-name="utility:delete"  onclick={deleteCardClick}></lightning-button>
+        </lightning-layout-item>
+    </lightning-layout>
 </template>
