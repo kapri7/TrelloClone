@@ -9,15 +9,18 @@ import { CurrentPageReference } from "lightning/navigation";
 export default class CardLayout extends LightningElement {
 
   @wire(CurrentPageReference) pageRef;
-  @track cardRows = [];
-  cardRowNum = 0;
-  handleRowButtonClick() {
-    this.cardRows.push(this.cardRowNum);
-    this.cardRowNum ++;
+  @track cardColumns = [];
+  cardColumnNum = 0;
+
+  addCardColumnClick() {
+
+    fireEvent(this.pageRef, "addcardcolumnclick", this.cardColumnNum);
+    this.cardColumns.push(this.cardColumnNum);
+    this.cardColumnNum ++;
   }
 
   deleteCardRow(event){
-    this.cardRows.splice(this.cardRows.indexOf(event.detail), 1);
-    fireEvent(this.pageRef, "deleterow", event.detail);
+    this.cardColumns.splice(this.cardColumns.indexOf(event.detail), 1);
+    fireEvent(this.pageRef, "deletecolumn", event.detail);
   }
 }

@@ -6,17 +6,17 @@ import { LightningElement, track, api, wire } from "lwc";
 import { fireEvent } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 
-export default class CardRow extends LightningElement {
+export default class CardColumn extends LightningElement {
   @wire(CurrentPageReference) pageRef;
 
   @track cards = [];
-  @api cardrowname;
+  @api cardcolumnname;
   cardNum = 0;
 
-  handleAddCard() {
+  addCardClick() {
     this.cards.push(this.cardNum);
-    let newCardInfo = {
-      cardRow: this.cardrowname,
+    const newCardInfo = {
+      cardColumn: this.cardcolumnname,
       cardName: this.cardNum
     };
     fireEvent(this.pageRef, "addcardclick", newCardInfo);
@@ -27,9 +27,9 @@ export default class CardRow extends LightningElement {
     this.cards.splice(this.cards.indexOf(event.detail), 1);
   }
 
-  handleRemoveRow(){
-    const event = new CustomEvent("deleterow", {
-      detail: this.cardrowname
+  handleRemoveColumn(){
+    const event = new CustomEvent("deletecolumn", {
+      detail: this.cardcolumnname
     });
     this.dispatchEvent(event);
   }

@@ -1,14 +1,15 @@
 <template>
-    <div class="slds-scrollable_x" style="height:auto;width:240rem">
+    <div class="slds-scrollable_x">
         <lightning-layout>
-            <template for:each={cardRows} for:item="cardRow">
-                <lightning-layout-item size="3" class="slds-p-around_x-small" key={cardRow}>
+            <template for:each={cardColumns} for:item="cardColumn">
+                <lightning-layout-item size="3" class="slds-p-around_x-small" key={cardColumn}>
 
-                    <c-card-row  cardrowname={cardRow} ondeleterow={deleteCardRow}></c-card-row>
+                    <c-card-column cardcolumnname={cardColumn} ondeletecolumn={deleteCardRow}></c-card-column>
 
                 </lightning-layout-item>
             </template>
-            <c-card-row-button cardrowname={cardRowNum} onaddcardrowclick={handleRowButtonClick}></c-card-row-button>
+            <lightning-button variant="brand-outline" label="Add new column" title="" onclick={addCardColumnClick}
+                              class="slds-m-left_x-small"></lightning-button>
         </lightning-layout>
     </div>
 </template>

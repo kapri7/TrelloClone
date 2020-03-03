@@ -1,0 +1,17 @@
+<template>
+    <div class="slds-scrollable_y">
+        <lightning-card title={cardcolumnname} icon-name="custom:custom13">
+            <lightning-button-icon icon-name="utility:close" variant="container" alternative-text="Add user"
+                                   class="slds-m-right_xx-small" title="Add user"
+                                   onclick={handleRemoveColumn}></lightning-button-icon>
+
+            <template for:each={cards} for:item="card">
+                <c-card key={card} cardcolumnname={cardcolumnname} cardname={card}
+                        ondeletecardclick={handleRemoveCard}></c-card>
+            </template>
+            <lightning-button variant="brand" label="Add card" title="Primary action" class="slds-m-left_x-small"
+                              onclick={addCardClick}></lightning-button>
+
+        </lightning-card>
+    </div>
+</template>

@@ -7,15 +7,14 @@ import { fireEvent } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 
 export default class Card extends LightningElement {
-  @api
-  cardname;
+  @api cardname;
   @wire(CurrentPageReference) pageRef;
 
   renderedCallback() {
 
   }
 
-  @api cardrow;
+  @api cardcolumnname;
 
   deleteCardClick() {
     const event = new CustomEvent("deletecardclick", {
@@ -24,7 +23,7 @@ export default class Card extends LightningElement {
     this.dispatchEvent(event);
     let cardInfo = {
       cardName: this.cardname,
-      cardRow: this.cardrow
+      cardColumn: this.cardcolumnname
     };
     fireEvent(this.pageRef, "deletecardclick", cardInfo);
   }
