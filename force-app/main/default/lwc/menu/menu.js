@@ -63,6 +63,7 @@ export default class MenuComponent extends LightningElement {
     registerListener("addcardcolumnclick", this.handleAddCardRowClick, this);
     registerListener("deletecardclick", this.handleDeleteCardClick, this);
     registerListener("deletecolumn", this.handleDeleteRow, this);
+    registerListener("dragdropmenu", this.handleDragDropLog, this);
   }
 
   disconnectedCallback() {
@@ -91,6 +92,12 @@ export default class MenuComponent extends LightningElement {
 
   handleDeleteRow(cardColumnName) {
     let message = "User *username* deleted cardColumn " + cardColumnName + "!";
+    let actionLogItem = new DeletedActionLogCardItem(this.getDate(), message);
+    this.actions.unshift(actionLogItem);
+  }
+
+  handleDragDropLog(info){
+    let message = "User *username* moved card " + info.draggedCard.cardName + " from column "+ info.draggedCard.cardColumn+" to column "+ info.targetColumn +".";
     let actionLogItem = new DeletedActionLogCardItem(this.getDate(), message);
     this.actions.unshift(actionLogItem);
   }

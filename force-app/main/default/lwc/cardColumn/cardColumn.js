@@ -3,7 +3,7 @@
  */
 
 import { LightningElement, track, api, wire } from "lwc";
-import { fireEvent } from "c/pubsub";
+import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 
 export default class CardColumn extends LightningElement {
@@ -12,6 +12,43 @@ export default class CardColumn extends LightningElement {
   @track cards = [];
   @api cardcolumnname;
   cardNum = 0;
+
+  connectedCallback() {
+    registerListener("draganddrop", this.handleDragAndDrop, this);
+  }
+
+  disconnectedCallback() {
+    unregisterAllListeners(this);
+  }
+  handleDragOver(evt) {
+    evt.preventDefault();
+  }
+
+  handleItemDrag(evt) {
+    const event = new CustomEvent("listitemdrag", {
+      detail: evt.detail
+    });
+
+    this.dispatchEvent(event);
+  }
+
+  handleDrop(evt) {
+    const event = new CustomEvent('itemdrop', {
+      detail: this.cardcolumnname
+    });
+
+    this.dispatchEvent(event);
+  }
+
+  handleDragAndDrop(info){
+    if(info.targetColumn ===  this.cardcolumnname){
+      this.cards.push(info.draggedCard.cardName);
+      fireEvent(this.pageRef, "dragdropmenu", info);
+    }
+    else if(info.draggedCard.cardColumn === this.cardcolumnname && info.targetColumn !==  this.cardcolumnname){
+      this.cards.splice(this.cards.indexOf(info.draggedCard.cardName), 1);
+    }
+  }
 
   addCardClick() {
     this.cards.push(this.cardNum);
@@ -27,7 +64,7 @@ export default class CardColumn extends LightningElement {
     this.cards.splice(this.cards.indexOf(event.detail), 1);
   }
 
-  handleRemoveColumn(){
+  handleRemoveColumn() {
     const event = new CustomEvent("deletecolumn", {
       detail: this.cardcolumnname
     });

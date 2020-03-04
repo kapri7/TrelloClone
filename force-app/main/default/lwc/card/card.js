@@ -10,10 +10,6 @@ export default class Card extends LightningElement {
   @api cardname;
   @wire(CurrentPageReference) pageRef;
 
-  renderedCallback() {
-
-  }
-
   @api cardcolumnname;
 
   deleteCardClick() {
@@ -26,6 +22,18 @@ export default class Card extends LightningElement {
       cardColumn: this.cardcolumnname
     };
     fireEvent(this.pageRef, "deletecardclick", cardInfo);
+  }
+
+  itemDragStart() {
+    const cardInfo = {
+      cardName: this.cardname,
+      cardColumn: this.cardcolumnname
+    }
+    const event = new CustomEvent('itemdrag', {
+      detail: cardInfo
+    });
+
+    this.dispatchEvent(event);
   }
 
 
