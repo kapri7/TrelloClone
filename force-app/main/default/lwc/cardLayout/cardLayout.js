@@ -3,22 +3,31 @@
  */
 
 import { LightningElement, track, wire } from "lwc";
-import { fireEvent } from "c/pubsub";
+import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 
 export default class CardLayout extends LightningElement {
 
   @wire(CurrentPageReference) pageRef;
+  connectedCallback() {
+    registerListener("addcolumnname", this.addColumn, this);
+  }
+
+  disconnectedCallback() {
+    unregisterAllListeners(this);
+  }
   @track cardColumns = [];
-  cardColumnNum = 0;
   currentDragCard;
   currentDropColumn;
 
-  addCardColumnClick() {
+  cardColumnClick() {
+    fireEvent(this.pageRef, "showmodalcolumn", this.cardColumnNum);
 
-    fireEvent(this.pageRef, "addcardcolumnclick", this.cardColumnNum);
-    this.cardColumns.push(this.cardColumnNum);
-    this.cardColumnNum++;
+
+  }
+  addColumn(columnName){
+    fireEvent(this.pageRef, "addcardcolumnclick", columnName);
+    this.cardColumns.push(columnName);
   }
 
   deleteCardRow(event) {

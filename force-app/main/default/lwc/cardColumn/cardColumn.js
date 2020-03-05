@@ -11,15 +11,16 @@ export default class CardColumn extends LightningElement {
 
   @track cards = [];
   @api cardcolumnname;
-  cardNum = 0;
 
   connectedCallback() {
     registerListener("draganddrop", this.handleDragAndDrop, this);
+    registerListener("addcardname", this.addCard, this);
   }
 
   disconnectedCallback() {
     unregisterAllListeners(this);
   }
+
   handleDragOver(evt) {
     evt.preventDefault();
   }
@@ -32,32 +33,34 @@ export default class CardColumn extends LightningElement {
     this.dispatchEvent(event);
   }
 
-  handleDrop(evt) {
-    const event = new CustomEvent('itemdrop', {
+  handleDrop() {
+    const event = new CustomEvent("itemdrop", {
       detail: this.cardcolumnname
     });
 
     this.dispatchEvent(event);
   }
 
-  handleDragAndDrop(info){
-    if(info.targetColumn ===  this.cardcolumnname){
+  handleDragAndDrop(info) {
+    if (info.draggedCard.cardColumn === this.cardcolumnname && info.targetColumn !== this.cardcolumnname) {
+      this.cards.splice(this.cards.indexOf(info.draggedCard.cardName), 1);
+    } else if (info.targetColumn === this.cardcolumnname && info.draggedCard.cardColumn !== this.cardcolumnname) {
       this.cards.push(info.draggedCard.cardName);
       fireEvent(this.pageRef, "dragdropmenu", info);
     }
-    else if(info.draggedCard.cardColumn === this.cardcolumnname && info.targetColumn !==  this.cardcolumnname){
-      this.cards.splice(this.cards.indexOf(info.draggedCard.cardName), 1);
-    }
   }
 
-  addCardClick() {
-    this.cards.push(this.cardNum);
-    const newCardInfo = {
-      cardColumn: this.cardcolumnname,
-      cardName: this.cardNum
-    };
-    fireEvent(this.pageRef, "addcardclick", newCardInfo);
-    this.cardNum++;
+  handleCardClick() {
+    fireEvent(this.pageRef, "showmodalcard", this.cardcolumnname);
+
+  }
+
+  addCard(newCardInfo) {
+    if (newCardInfo.cardColumn === this.cardcolumnname) {
+      this.cards.push(newCardInfo.cardName);
+      fireEvent(this.pageRef, "addcardclick", newCardInfo);
+    }
+
   }
 
   handleRemoveCard(event) {

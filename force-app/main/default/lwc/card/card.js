@@ -28,7 +28,7 @@ export default class Card extends LightningElement {
     const cardInfo = {
       cardName: this.cardname,
       cardColumn: this.cardcolumnname
-    }
+    };
     const event = new CustomEvent('itemdrag', {
       detail: cardInfo
     });
