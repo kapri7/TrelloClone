@@ -5,6 +5,7 @@
       <configuration>
         <option name="connectionName" value="trello" />
         <option name="connectionType" value="OAUTH" />
+        <option name="defaultSourceRootUrl" value="file://$MODULE_DIR$/force-app/main/default" />
       </configuration>
     </facet>
   </component>
