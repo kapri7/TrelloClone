@@ -3,5 +3,18 @@
  */
 
 public with sharing class CardColumnController {
-
+    @AuraEnabled(Cacheable=true)
+    public static CardColumn__c[] getAllColumns() {
+        return [
+                SELECT Id,Name,Dashboard__c
+                FROM CardColumn__c
+        ];
+    }
+    @AuraEnabled
+    public static CardColumn__c insertNewColumn(CardColumn__c cardColumn) {
+        System.debug(JSON.serialize(cardColumn));
+        cardColumn.Dashboard__c = 'a003X000015oBdQQAU';
+        insert cardColumn;
+        return cardColumn;
+    }
 }

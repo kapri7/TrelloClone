@@ -1,29 +1,14 @@
 import { LightningElement, track, wire } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
 import { registerListener, unregisterAllListeners } from "c/pubsub";
-
-
-class ActionLogCardItem {
-
-
-  constructor(date, message, name, cardColumnNumber) {
-    this.date = date;
-    this.message = message;
-    this.cardColumnName = cardColumnNumber;
-    this.name = name;
-  }
-}
-
-class ActionLogCardColumnItem {
-
-  constructor(date, message, name) {
-    this.date = date;
-    this.message = message;
-    this.name = name;
-  }
-}
-
-class DeletedActionLogCardItem {
+import getAllLogItems from "@salesforce/apex/LogItemController.getAllLogItems";
+import insertNewLogItem from "@salesforce/apex/LogItemController.insertNewLogItem";
+import LOG_OBJECT from '@salesforce/schema/LogItem__c';
+import NAME_FIELD from "@salesforce/schema/LogItem__c.Name";
+import DATE_FIELD from "@salesforce/schema/LogItem__c.Date__c";
+import MESSAGE_FIELD from "@salesforce/schema/LogItem__c.Message__c";
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+class ActionLogItem {
 
   constructor(date, message) {
     this.date = date;
@@ -36,6 +21,17 @@ export default class MenuComponent extends LightningElement {
   @wire(CurrentPageReference) pageRef;
   @track greeting = "Test";
 
+  @track name = NAME_FIELD;
+  @track message = MESSAGE_FIELD;
+  @track dateLog = DATE_FIELD;
+
+  rec = {
+    Name: this.name,
+    Message__c: this.message,
+    Date__c: this.dateLog
+  };
+
+
   handleGreetingChange(event) {
     this.greeting = event.target.value;
   }
@@ -44,9 +40,43 @@ export default class MenuComponent extends LightningElement {
     return `About dashboard ${this.greeting}!`;
   }
 
+
   @track actions = [];
 
-  getDate() {
+  @wire(getAllLogItems)
+  getLogInform(result) {
+    if (result.data) {
+      for (let i of result.data) {
+        let message = i.Message__c;
+        let date = i.Date__c.replace("T", " ").slice(0, 19);//19 - 24 unused elements
+        let actionLogItem = new ActionLogItem(date, message);
+        this.actions.unshift(actionLogItem);
+      }
+    }
+  }
+
+  insertLogItem() {
+    insertNewLogItem({ logItem: this.rec })
+      .then(result => {
+        this.message = result;
+        this.error = undefined;
+        if (this.message !== undefined) {
+          this.rec.Name = "";
+          this.rec.Message__c = "";
+          this.rec.Date__c = "";
+        }
+
+        console.log(JSON.stringify(result));
+        console.log("result", this.message);
+      })
+      .catch(error => {
+        this.message = undefined;
+        this.error = error;
+        console.log("error", JSON.stringify(this.error));
+      });
+  }
+
+  getCurrentDate() {
     const date = new Date();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -55,12 +85,12 @@ export default class MenuComponent extends LightningElement {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const seconds = String(date.getSeconds()).padStart(2, "0");
 
-    return month + "/" + day + "/" + year + "  " + hours + "." + minutes + "." + seconds;
+    return year + '-' + month + '-' + day + ' '  + hours + ':' + minutes + ':' + seconds;
   }
 
   connectedCallback() {
     registerListener("addcardclick", this.handleAddCardClick, this);
-    registerListener("addcardcolumnclick", this.handleAddCardRowClick, this);
+    registerListener("addcardcolumnclick", this.handleAddCardColumnClick, this);
     registerListener("deletecardclick", this.handleDeleteCardClick, this);
     registerListener("deletecolumn", this.handleDeleteRow, this);
     registerListener("dragdropmenu", this.handleDragDropLog, this);
@@ -70,35 +100,39 @@ export default class MenuComponent extends LightningElement {
     unregisterAllListeners(this);
   }
 
-  handleAddCardClick(cardInfo) {
-    let message = "User *username* added new card " + cardInfo.cardName + " at cardColumn " + cardInfo.cardColumn + " !";
-    let actionLogItem = new ActionLogCardItem(this.getDate(), message, cardInfo.cardName, cardInfo.cardColumn);
+  displayLogMessage(message){
+    let currentDateTime = this.getCurrentDate();
+    let actionLogItem = new ActionLogItem(currentDateTime, message);
     this.actions.unshift(actionLogItem);
-
-
+    this.rec.Name = 'default';
+    this.rec.Date__c = currentDateTime.replace(' ','T') + '.000Z';
+    this.rec.Message__c = message;
+    this.insertLogItem();
   }
 
-  handleAddCardRowClick(cardColumnName) {
-    let message = "User *username* added new cardColumn " + cardColumnName + "!";
-    let actionLogItem = new ActionLogCardColumnItem(this.getDate(), message, cardColumnName);
-    this.actions.unshift(actionLogItem);
+  handleAddCardClick(cardInfo) {
+    let message = "User *username* added new card " + cardInfo.cardName + " at list " + cardInfo.cardColumn + " !";
+    this.displayLogMessage(message);
+  }
+
+  handleAddCardColumnClick(cardColumnName) {
+    let message = 'User *username* added new list ' + cardColumnName + '!';
+    this.displayLogMessage(message);
+
   }
 
   handleDeleteCardClick(cardInfo) {
-    let message = "User *username* deleted card " + cardInfo.cardName + " at cardColumn " + cardInfo.cardColumn + "!";
-    let actionLogItem = new DeletedActionLogCardItem(this.getDate(), message);
-    this.actions.unshift(actionLogItem);
+    let message = "User *username* deleted card " + cardInfo.cardName + " at list " + cardInfo.cardColumn + "!";
+    this.displayLogMessage(message);
   }
 
   handleDeleteRow(cardColumnName) {
-    let message = "User *username* deleted cardColumn " + cardColumnName + "!";
-    let actionLogItem = new DeletedActionLogCardItem(this.getDate(), message);
-    this.actions.unshift(actionLogItem);
+    let message = "User *username* deleted list " + cardColumnName + "!";
+    this.displayLogMessage(message);
   }
 
-  handleDragDropLog(info){
-    let message = "User *username* moved card " + info.draggedCard.cardName + " from column "+ info.draggedCard.cardColumn+" to column "+ info.targetColumn +".";
-    let actionLogItem = new DeletedActionLogCardItem(this.getDate(), message);
-    this.actions.unshift(actionLogItem);
+  handleDragDropLog(info) {
+    let message = "User *username* moved card " + info.draggedCard.cardName + " from list " + info.draggedCard.cardColumn + " to list " + info.targetColumn + ".";
+    this.displayLogMessage(message);
   }
 }
