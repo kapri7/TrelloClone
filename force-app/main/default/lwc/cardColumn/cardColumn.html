@@ -2,8 +2,8 @@
     <div class="droppable drop-container" ondragover={handleDragOver} ondrop={handleDrop}>
         <div class="slds-scrollable_y">
             <lightning-card title={columninfo.name} icon-name="custom:custom13">
-                <lightning-button-icon icon-name="utility:close" variant="container" alternative-text="Add user"
-                                       class="slds-m-right_xx-small" title="Add user"
+                <lightning-button-icon icon-name="utility:close" variant="container" alternative-text="Remove list" slot="actions"
+                                       class="slds-m-right_xx-small" title="Remove list"
                                        onclick={handleRemoveColumn}></lightning-button-icon>
                 <template for:each={cards} for:item="card">
                     <c-card key={card} cardcolumn={columninfo} card={card}

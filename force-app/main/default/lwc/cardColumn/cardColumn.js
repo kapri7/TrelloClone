@@ -18,10 +18,11 @@ import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 
 class Card {
-  constructor(id, name, columnId) {
+  constructor(id, name, columnId,description="") {
     this.id = id;
     this.name = name;
     this.columnId = columnId;
+    this.description = description;
   }
 }
 
@@ -133,12 +134,19 @@ export default class CardColumn extends LightningElement {
   connectedCallback() {
     registerListener("draganddrop", this.handleDragAndDrop, this);
     registerListener("addcardname", this.addCard, this);
+    registerListener("updatecardinfo", this.updateCardInfo, this);
   }
 
   disconnectedCallback() {
     unregisterAllListeners(this);
   }
+  updateCardInfo(card){
+    this.rec.Name = card.name;
+    this.rec.CardColumn__c =card.columnId;
+    this.rec.Description__c = card.description;
 
+    this.updateCardItem(card.id);
+  }
   handleDragOver(evt) {
     evt.preventDefault();
   }

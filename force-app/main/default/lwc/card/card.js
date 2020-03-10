@@ -36,5 +36,13 @@ export default class Card extends LightningElement {
     this.dispatchEvent(event);
   }
 
+  selectCardInfo(){
+    const cardInfo = {
+      card: this.card,
+      cardColumn: this.cardcolumn
+    };
+    fireEvent(this.pageRef, "cardinfoclick", cardInfo);
+  }
+
 
 }

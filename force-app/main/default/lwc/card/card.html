@@ -1,5 +1,5 @@
 <template>
-    <div class="draggable" draggable="true" ondragstart={itemDragStart}>
+    <div class="draggable" draggable="true" ondragstart={itemDragStart} onclick={selectCardInfo}>
     <lightning-layout class="slds-m-around_medium">
         <lightning-layout-item>
             <div class ="slds-box">{card.name}</div>
