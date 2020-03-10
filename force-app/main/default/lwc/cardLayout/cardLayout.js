@@ -7,11 +7,21 @@ import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 import getAllColumns from "@salesforce/apex/CardColumnController.getAllColumns";
 import insertNewColumn from "@salesforce/apex/CardColumnController.insertNewColumn";
+import deleteColumn from "@salesforce/apex/CardColumnController.deleteColumn";
 import LOG_OBJECT from "@salesforce/schema/CardColumn__c";
 import NAME_FIELD from "@salesforce/schema/CardColumn__c.Name";
 import ID_FIELD from "@salesforce/schema/CardColumn__c.Id";
 import DASHBOARD_FIELD from "@salesforce/schema/CardColumn__c.Dashboard__c";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+
+
+class Column {
+  constructor(id, name) {
+    this.id = id;
+    this.name = name;
+  }
+}
+
 
 export default class CardLayout extends LightningElement {
   @track name = NAME_FIELD;
@@ -28,8 +38,8 @@ export default class CardLayout extends LightningElement {
   getColumnInform(result) {
     if (result.data) {
       for (let i of result.data) {
-        this.id = i.Id;
-        this.cardColumns.push(i.Name);
+        let column = new Column(i.Id, i.Name);
+        this.cardColumns.push(column);
       }
     }
   }
@@ -37,27 +47,35 @@ export default class CardLayout extends LightningElement {
   insertColumnItem() {
     insertNewColumn({ cardColumn: this.rec })
       .then(result => {
-        this.message = result;
-        this.error = undefined;
-        if (this.message !== undefined) {
-          this.rec.Name = "";
-          //this.rec.Dashboard__c = "";
-          //this.rec.Id = "";
-
-          this.id = result.Id;
-          alert(this.id);
-          this.dispatchEvent(
-            new ShowToastEvent({
-              title: "Success",
-              message: "Column created",
-              variant: "success"
-            })
-          );
-        }
+        let column = new Column(result.Id, this.rec.Name);
+        this.cardColumns.push(column);
 
         console.log(JSON.stringify(result));
         console.log("result", this.message);
       })
+
+      .catch(error => {
+        this.message = undefined;
+        this.error = error;
+        this.dispatchEvent(
+          new ShowToastEvent({
+            title: "Error creating record",
+            message: error.body.message,
+            variant: "error"
+          })
+        );
+        console.log("error", JSON.stringify(this.error));
+      });
+  }
+
+  deleteColumnItem(id, itemIndex) {
+    deleteColumn({ cardColumnId: id })
+      .then(result => {
+        this.cardColumns.splice(itemIndex, 1);
+        console.log(JSON.stringify(result));
+        console.log("result", this.message);
+      })
+
       .catch(error => {
         this.message = undefined;
         this.error = error;
@@ -87,28 +105,27 @@ export default class CardLayout extends LightningElement {
   currentDropColumn;
 
   cardColumnClick() {
-    fireEvent(this.pageRef, "showmodalcolumn", this.cardColumnNum);
-
-
+    fireEvent(this.pageRef, "showmodalcolumn",null);
   }
 
   addColumn(columnName) {
     fireEvent(this.pageRef, "addcardcolumnclick", columnName);
     this.rec.Name = columnName;
     this.insertColumnItem();
-    this.cardColumns.push(columnName);//todo: pass here custom object column
-
-
   }
 
   deleteCardColumn(event) {
-    this.cardColumns.splice(this.cardColumns.indexOf(event.detail), 1);
-    fireEvent(this.pageRef, "deletecolumn", event.detail);
+    let ind = this.cardColumns.findIndex((element, index, array) => {
+      if (element.id === event.detail.id) {
+        return true;
+      }
+    });
+    this.deleteColumnItem(event.detail.id, ind);
+    fireEvent(this.pageRef, "deletecolumn", event.detail.name);
 
   }
 
   handleListItemDrag(evt) {
-    //console.log("Dragged id is: " + evt.detail);
     this.currentDragCard = evt.detail;
   }
 

@@ -10,7 +10,7 @@ export default class Card extends LightningElement {
   @api cardname;
   @wire(CurrentPageReference) pageRef;
 
-  @api cardcolumnname;
+  @api cardcolumnname;//todo: columnId should be here
 
   deleteCardClick() {
     const event = new CustomEvent("deletecardclick", {

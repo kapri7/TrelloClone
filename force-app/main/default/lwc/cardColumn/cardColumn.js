@@ -28,8 +28,8 @@ export default class CardColumn extends LightningElement {
     if (result.data) {
       for (let i of result.data) {
         this.id = i.Id;// ?
-        if(i.CardColumn__c === this.cardcolumnid)
-        this.cards.push(i.Name);
+        if(i.CardColumn__c === this.columninfo.id)
+        this.cards.push(i.Name);//todo: add class for card
       }
     }
   }
@@ -74,8 +74,7 @@ export default class CardColumn extends LightningElement {
   @wire(CurrentPageReference) pageRef;
 
   @track cards = [];
-  @api cardcolumnname;
-  @api cardcolumnid;
+  @api columninfo;
 
   connectedCallback() {
     registerListener("draganddrop", this.handleDragAndDrop, this);
@@ -100,30 +99,30 @@ export default class CardColumn extends LightningElement {
 
   handleDrop() {
     const event = new CustomEvent("itemdrop", {
-      detail: this.cardcolumnname
+      detail: this.columninfo.name
     });
 
     this.dispatchEvent(event);
   }
 
   handleDragAndDrop(info) {
-    if (info.draggedCard.cardColumn === this.cardcolumnname && info.targetColumn !== this.cardcolumnname) {
+    if (info.draggedCard.cardColumn === this.columninfo.name && info.targetColumn !== this.columninfo.name) {
       this.cards.splice(this.cards.indexOf(info.draggedCard.cardName), 1);
-    } else if (info.targetColumn === this.cardcolumnname && info.draggedCard.cardColumn !== this.cardcolumnname) {
+    } else if (info.targetColumn === this.columninfo.name && info.draggedCard.cardColumn !== this.columninfo.name) {
       this.cards.push(info.draggedCard.cardName);
       fireEvent(this.pageRef, "dragdropmenu", info);
     }
   }
 
   handleCardClick() {
-    fireEvent(this.pageRef, "showmodalcard", this.cardcolumnname);
+    fireEvent(this.pageRef, "showmodalcard", this.columninfo.name);
 
   }
 
   addCard(newCardInfo) {
-    if (newCardInfo.cardColumn === this.cardcolumnname) {
+    if (newCardInfo.cardColumn === this.columninfo.name) {
       this.rec.Name = newCardInfo.cardName;
-      this.rec.CardColumn__c = this.cardcolumnid;
+      this.rec.CardColumn__c = this.columninfo.id;
       this.insertCardItem();
       this.cards.push(newCardInfo.cardName);
       fireEvent(this.pageRef, "addcardclick", newCardInfo);
@@ -137,7 +136,7 @@ export default class CardColumn extends LightningElement {
 
   handleRemoveColumn() {
     const event = new CustomEvent("deletecolumn", {
-      detail: this.cardcolumnname
+      detail: this.columninfo
     });
     this.dispatchEvent(event);
   }

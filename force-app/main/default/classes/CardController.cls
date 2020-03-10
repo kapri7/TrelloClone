@@ -8,6 +8,7 @@ public with sharing class CardController {
         return [
                 SELECT Id,Name,Description__c,CardColumn__c
                 FROM Card__c
+                ORDER BY CreatedDate
         ];
     }
     @AuraEnabled

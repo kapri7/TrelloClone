@@ -1,7 +1,6 @@
 /**
  * A basic pub-sub mechanism for sibling component communication
  *
- * TODO - adopt standard flexipage sibling communication mechanism when it's available.
  */
 
 const events = {};

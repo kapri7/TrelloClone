@@ -8,6 +8,7 @@ public with sharing class CardColumnController {
         return [
                 SELECT Id,Name,Dashboard__c
                 FROM CardColumn__c
+                ORDER BY CreatedDate
         ];
     }
     @AuraEnabled
@@ -16,5 +17,12 @@ public with sharing class CardColumnController {
         cardColumn.Dashboard__c = 'a003X000015oBdQQAU';
         insert cardColumn;
         return cardColumn;
+    }
+
+    @AuraEnabled
+    public static void deleteColumn(Id cardColumnId) {
+        System.debug(JSON.serialize(cardColumnId));
+        CardColumn__c cardColumn = [SELECT Id FROM CardColumn__c WHERE Id = :cardColumnId];
+        delete cardColumn;
     }
 }
