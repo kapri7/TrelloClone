@@ -7,27 +7,27 @@ import { fireEvent } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 
 export default class Card extends LightningElement {
-  @api cardname;
+  @api card;
   @wire(CurrentPageReference) pageRef;
 
-  @api cardcolumnname;//todo: columnId should be here
+  @api cardcolumn;
 
   deleteCardClick() {
     const event = new CustomEvent("deletecardclick", {
-      detail: this.cardname
+      detail: this.card
     });
     this.dispatchEvent(event);
     let cardInfo = {
-      cardName: this.cardname,
-      cardColumn: this.cardcolumnname
+      card: this.card,
+      cardColumn: this.cardcolumn
     };
     fireEvent(this.pageRef, "deletecardclick", cardInfo);
   }
 
   itemDragStart() {
     const cardInfo = {
-      cardName: this.cardname,
-      cardColumn: this.cardcolumnname
+      card: this.card,
+      cardColumn: this.cardcolumn
     };
     const event = new CustomEvent('itemdrag', {
       detail: cardInfo

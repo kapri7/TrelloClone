@@ -66,8 +66,8 @@ export default class MenuComponent extends LightningElement {
           this.rec.Date__c = "";
         }
 
-        console.log(JSON.stringify(result));
-        console.log("result", this.message);
+        //console.log(JSON.stringify(result));
+       // console.log("result", this.message);
       })
       .catch(error => {
         this.message = undefined;
@@ -104,14 +104,14 @@ export default class MenuComponent extends LightningElement {
     let currentDateTime = this.getCurrentDate();
     let actionLogItem = new ActionLogItem(currentDateTime, message);
     this.actions.unshift(actionLogItem);
-    this.rec.Name = 'default';
+    this.rec.Name = currentDateTime.replace(' ','T') + '.000Z';
     this.rec.Date__c = currentDateTime.replace(' ','T') + '.000Z';
     this.rec.Message__c = message;
     this.insertLogItem();
   }
 
   handleAddCardClick(cardInfo) {
-    let message = "User *username* added new card " + cardInfo.cardName + " at list " + cardInfo.cardColumn + " !";
+    let message = "User *username* added new card " + cardInfo.cardName + " at list " + cardInfo.cardColumn.name + " !";
     this.displayLogMessage(message);
   }
 
@@ -122,7 +122,7 @@ export default class MenuComponent extends LightningElement {
   }
 
   handleDeleteCardClick(cardInfo) {
-    let message = "User *username* deleted card " + cardInfo.cardName + " at list " + cardInfo.cardColumn + "!";
+    let message = "User *username* deleted card " + cardInfo.card.name + " at list " + cardInfo.cardColumn.name + "!";
     this.displayLogMessage(message);
   }
 
@@ -132,7 +132,7 @@ export default class MenuComponent extends LightningElement {
   }
 
   handleDragDropLog(info) {
-    let message = "User *username* moved card " + info.draggedCard.cardName + " from list " + info.draggedCard.cardColumn + " to list " + info.targetColumn + ".";
+    let message = "User *username* moved card " + info.draggedCard.card.name + " from list " + info.draggedCard.cardColumn.name + " to list " + info.targetColumn.name + ".";
     this.displayLogMessage(message);
   }
 }

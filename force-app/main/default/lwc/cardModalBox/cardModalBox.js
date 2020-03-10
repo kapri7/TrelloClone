@@ -10,7 +10,7 @@ export default class CardModalBox extends LightningElement {
   @track openModel;
   @track cardName = "";
   @wire(CurrentPageReference) pageRef;
-  cardColumnName;
+  cardColumn;
   connectedCallback() {
     registerListener("showmodalcard", this.openModal, this);
   }
@@ -23,9 +23,9 @@ export default class CardModalBox extends LightningElement {
     this.cardName = event.target.value;
   }
 
-  openModal(cardColumnName) {
+  openModal(cardColumn) {
     this.openModel = true;
-    this.cardColumnName = cardColumnName;
+    this.cardColumn = cardColumn;
   }
 
   closeModal() {
@@ -35,7 +35,7 @@ export default class CardModalBox extends LightningElement {
   saveMethod() {
     if (this.cardName !== "") {
       const newCardInfo = {
-        cardColumn: this.cardColumnName,
+        cardColumn: this.cardColumn,
         cardName: this.cardName
       };
       fireEvent(this.pageRef, "addcardname", newCardInfo);

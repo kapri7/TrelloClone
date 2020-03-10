@@ -30,7 +30,6 @@ export default class CardLayout extends LightningElement {
 
   rec = {
     Name: this.name
-    //Id: this.id,
     //Dashboard__c: this.dashboard
   };
 
