@@ -1,11 +1,11 @@
 <template>
-    <div class="draggable" draggable="true" ondragstart={itemDragStart} onclick={selectCardInfo}>
+    <div class="draggable" draggable="true" ondragstart={itemDragStart}>
     <lightning-layout class="slds-m-around_medium">
-        <lightning-layout-item>
+        <lightning-layout-item onclick={selectCardInfo}>
             <div class ="slds-box">{card.name}</div>
         </lightning-layout-item>
         <lightning-layout-item>
-        <lightning-button class = "slds-m-left_x-small" variant="destructive" label="" title="Delete card" icon-name="utility:delete"  onclick={deleteCardClick}></lightning-button>
+        <lightning-button class = "slds-m-left_x-small" variant="destructive" label="" title="Delete card" icon-name="utility:delete"  onclick={deleteCard}></lightning-button>
         </lightning-layout-item>
     </lightning-layout>
     </div>

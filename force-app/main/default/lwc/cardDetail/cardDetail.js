@@ -10,8 +10,9 @@ export default class CardDetail extends LightningElement {
   @track card;
   @track openModel;
   @wire(CurrentPageReference) pageRef;
+  previousColumnId;
   handleSuccess(event) {
-   // this.contactId = event.detail.id;
+
   }
   connectedCallback() {
     registerListener("cardinfoclick", this.handleCardInfoClick, this);
@@ -24,6 +25,7 @@ export default class CardDetail extends LightningElement {
   handleCardInfoClick(cardInfo){
     this.openModel = true;
     this.card = cardInfo.card;
+    this.previousColumn = cardInfo.cardColumn;
 
   }
 
@@ -31,16 +33,21 @@ export default class CardDetail extends LightningElement {
     this.openModel = false;
   }
   saveMethod(){
-    fireEvent(this.pageRef,"updatecardinfo",this.card);
+    const updatedCard= {
+      newCard:this.card,
+      oldColumn: this.previousColumn
+    };
+
+    fireEvent(this.pageRef,"updatecardinfo",updatedCard);
     this.openModel = false;
   }
-  handlerNameChange(event){
+  handleNameChange(event){
     this.card.name = event.target.value;
   }
-  handlerCardColumnChange(event){
+  handleCardColumnChange(event){
     this.card.columnId = event.target.value;
   }
-  handlerDescriptionChange(event){
+  handleDescriptionChange(event){
     this.card.description = event.target.value;
   }
 }

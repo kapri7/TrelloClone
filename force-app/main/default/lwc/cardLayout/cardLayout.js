@@ -37,7 +37,7 @@ export default class CardLayout extends LightningElement {
   getColumnInform(result) {
     if (result.data) {
       for (let i of result.data) {
-        let column = new Column(i.Id, i.Name);
+        const column = new Column(i.Id, i.Name);
         this.cardColumns.push(column);
       }
     }
@@ -46,15 +46,14 @@ export default class CardLayout extends LightningElement {
   insertColumnItem() {
     insertNewColumn({ cardColumn: this.rec })
       .then(result => {
-        let column = new Column(result.Id, this.rec.Name);
+        const column = new Column(result.Id, this.rec.Name);
         this.cardColumns.push(column);
 
-        console.log(JSON.stringify(result));
-        console.log("result", this.message);
+        //console.log(JSON.stringify(result));
+        //console.log("result", this.message);
       })
 
       .catch(error => {
-        this.message = undefined;
         this.error = error;
         this.dispatchEvent(
           new ShowToastEvent({
@@ -71,12 +70,11 @@ export default class CardLayout extends LightningElement {
     deleteColumn({ cardColumnId: id })
       .then(result => {
         this.cardColumns.splice(itemIndex, 1);
-        console.log(JSON.stringify(result));
-        console.log("result", this.message);
+        //console.log(JSON.stringify(result));
+        //console.log("result", this.message);
       })
 
       .catch(error => {
-        this.message = undefined;
         this.error = error;
         this.dispatchEvent(
           new ShowToastEvent({
@@ -103,7 +101,7 @@ export default class CardLayout extends LightningElement {
   currentDragCard;
   currentDropColumn;
 
-  cardColumnClick() {
+  handleCardColumn() {
     fireEvent(this.pageRef, "showmodalcolumn",null);
   }
 
@@ -114,7 +112,7 @@ export default class CardLayout extends LightningElement {
   }
 
   deleteCardColumn(event) {
-    let ind = this.cardColumns.findIndex((element, index, array) => {
+    const ind = this.cardColumns.findIndex((element, index, array) => {
       if (element.id === event.detail.id) {
         return true;
       }

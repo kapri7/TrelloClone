@@ -4,7 +4,9 @@
 
 <!-- Action Item -->
 <template>
-    <lightning-card  title={today} icon-name="custom:custom83">
-        <p class = 'LogAction'>{actionitem}</p>
+    <lightning-card icon-name="custom:custom83" slot = "actions">
+        <p>{actionitem}</p>
+        <p><lightning-formatted-date-time value={today} year="numeric" month="numeric" day="numeric" hour="2-digit"
+                                          minute="2-digit"  second="2-digit" time-zone-name="short" hour12="true"></lightning-formatted-date-time></p>
     </lightning-card>
 </template>

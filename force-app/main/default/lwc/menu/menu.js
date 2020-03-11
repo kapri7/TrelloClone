@@ -7,7 +7,7 @@ import LOG_OBJECT from '@salesforce/schema/LogItem__c';
 import NAME_FIELD from "@salesforce/schema/LogItem__c.Name";
 import DATE_FIELD from "@salesforce/schema/LogItem__c.Date__c";
 import MESSAGE_FIELD from "@salesforce/schema/LogItem__c.Message__c";
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
 class ActionLogItem {
 
   constructor(date, message) {
@@ -47,9 +47,9 @@ export default class MenuComponent extends LightningElement {
   getLogInform(result) {
     if (result.data) {
       for (let i of result.data) {
-        let message = i.Message__c;
-        let date = i.Date__c.replace("T", " ").slice(0, 19);//19 - 24 unused elements
-        let actionLogItem = new ActionLogItem(date, message);
+        const message = i.Message__c;
+        const date = i.Date__c;
+        const actionLogItem = new ActionLogItem(date, message);
         this.actions.unshift(actionLogItem);
       }
     }
@@ -58,42 +58,23 @@ export default class MenuComponent extends LightningElement {
   insertLogItem() {
     insertNewLogItem({ logItem: this.rec })
       .then(result => {
-        this.message = result;
-        this.error = undefined;
-        if (this.message !== undefined) {
-          this.rec.Name = "";
-          this.rec.Message__c = "";
-          this.rec.Date__c = "";
-        }
 
         //console.log(JSON.stringify(result));
        // console.log("result", this.message);
       })
       .catch(error => {
-        this.message = undefined;
         this.error = error;
         console.log("error", JSON.stringify(this.error));
       });
   }
 
-  getCurrentDate() {
-    const date = new Date();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-
-    return year + '-' + month + '-' + day + ' '  + hours + ':' + minutes + ':' + seconds;
-  }
-
   connectedCallback() {
-    registerListener("addcardclick", this.handleAddCardClick, this);
-    registerListener("addcardcolumnclick", this.handleAddCardColumnClick, this);
-    registerListener("deletecardclick", this.handleDeleteCardClick, this);
+    registerListener("addcardclick", this.handleAddCard, this);
+    registerListener("addcardcolumnclick", this.handleAddCardColumn, this);
+    registerListener("deletecardclick", this.handleDeleteCard, this);
     registerListener("deletecolumn", this.handleDeleteRow, this);
     registerListener("dragdropmenu", this.handleDragDropLog, this);
+    registerListener("changecolumn", this.handleChangeColumn, this);
   }
 
   disconnectedCallback() {
@@ -101,38 +82,43 @@ export default class MenuComponent extends LightningElement {
   }
 
   displayLogMessage(message){
-    let currentDateTime = this.getCurrentDate();
-    let actionLogItem = new ActionLogItem(currentDateTime, message);
+    const currentDateTime = new Date().getTime();
+    const actionLogItem = new ActionLogItem(currentDateTime, message);
     this.actions.unshift(actionLogItem);
-    this.rec.Name = currentDateTime.replace(' ','T') + '.000Z';
-    this.rec.Date__c = currentDateTime.replace(' ','T') + '.000Z';
+    this.rec.Name = "default";
+    this.rec.Date__c = currentDateTime;
     this.rec.Message__c = message;
     this.insertLogItem();
   }
 
-  handleAddCardClick(cardInfo) {
-    let message = "User *username* added new card " + cardInfo.cardName + " at list " + cardInfo.cardColumn.name + " !";
+  handleChangeColumn(info){
+    const message = "User *username* moved card " + info.cardName + " from list " + info.startColumn + " to list " + info.destinationColumn + ".";
     this.displayLogMessage(message);
   }
 
-  handleAddCardColumnClick(cardColumnName) {
-    let message = 'User *username* added new list ' + cardColumnName + '!';
+  handleAddCard(cardInfo) {
+    const message = "User *username* added new card " + cardInfo.cardName + " at list " + cardInfo.cardColumn.name + " !";
+    this.displayLogMessage(message);
+  }
+
+  handleAddCardColumn(cardColumnName) {
+    const message = 'User *username* added new list ' + cardColumnName + '!';
     this.displayLogMessage(message);
 
   }
 
-  handleDeleteCardClick(cardInfo) {
-    let message = "User *username* deleted card " + cardInfo.card.name + " at list " + cardInfo.cardColumn.name + "!";
+  handleDeleteCard(cardInfo) {
+    const message = "User *username* deleted card " + cardInfo.card.name + " at list " + cardInfo.cardColumn.name + "!";
     this.displayLogMessage(message);
   }
 
   handleDeleteRow(cardColumnName) {
-    let message = "User *username* deleted list " + cardColumnName + "!";
+    const message = "User *username* deleted list " + cardColumnName + "!";
     this.displayLogMessage(message);
   }
 
   handleDragDropLog(info) {
-    let message = "User *username* moved card " + info.draggedCard.card.name + " from list " + info.draggedCard.cardColumn.name + " to list " + info.targetColumn.name + ".";
+    const message = "User *username* moved card " + info.draggedCard.card.name + " from list " + info.draggedCard.cardColumn.name + " to list " + info.targetColumn.name + ".";
     this.displayLogMessage(message);
   }
 }

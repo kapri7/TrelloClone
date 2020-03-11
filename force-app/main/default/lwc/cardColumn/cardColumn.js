@@ -18,7 +18,7 @@ import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 
 class Card {
-  constructor(id, name, columnId,description="") {
+  constructor(id, name, columnId, description = "") {
     this.id = id;
     this.name = name;
     this.columnId = columnId;
@@ -31,6 +31,11 @@ export default class CardColumn extends LightningElement {
   @track id = ID_FIELD;
   @track cardcolumn = CARDCOLUMN_FIELD;
   @track description = DESCRIPTION_FIELD;
+  @wire(CurrentPageReference) pageRef;
+
+  @track cards = [];
+  @api columninfo;
+
 
   rec = {
     Name: this.name,
@@ -44,7 +49,7 @@ export default class CardColumn extends LightningElement {
       for (let i of result.data) {
         this.id = i.Id;
         if (i.CardColumn__c === this.columninfo.id) {
-          let card = new Card(i.Id, i.Name, i.CardColumn__c);
+          const card = new Card(i.Id, i.Name, i.CardColumn__c, i.Description__c);
           this.cards.push(card);
         }
 
@@ -55,19 +60,10 @@ export default class CardColumn extends LightningElement {
   insertCardItem() {
     insertNewCard({ card: this.rec })
       .then(result => {
-        this.message = result;
-        this.error = undefined;
-        if (this.message !== undefined) {
-          this.rec.Name = "";
-          this.rec.CardColumn__c = "";
-          this.rec.Description__c = "";
-        }
-
         console.log(JSON.stringify(result));
         console.log("result", this.message);
       })
       .catch(error => {
-        this.message = undefined;
         this.error = error;
         this.dispatchEvent(
           new ShowToastEvent({
@@ -89,7 +85,6 @@ export default class CardColumn extends LightningElement {
       })
 
       .catch(error => {
-        this.message = undefined;
         this.error = error;
         this.dispatchEvent(
           new ShowToastEvent({
@@ -102,9 +97,31 @@ export default class CardColumn extends LightningElement {
       });
   }
 
-  updateCardItem(id) {
-    updateCard({ cardId: id, newCard: this.rec })
+  updateCardItem(cardId, oldColumn = "") {
+    updateCard({ cardId: cardId, newCard: this.rec })
       .then(result => {
+        const ind = this.cards.findIndex((element, index, array) => {
+          if (element.id === cardId) {
+            return true;
+          }
+        });
+        fireEvent(this.pageRef, "updateCardName", this.cards[ind]);
+        if (oldColumn !== "") {
+          if (this.columninfo.id === oldColumn.id) {
+
+            this.cards.splice(ind, 1);
+          } else if (this.columninfo.id === this.rec.CardColumn__c) {
+            const info = {
+              cardName: this.rec.Name,
+              destinationColumn: this.columninfo.name,
+              startColumn: oldColumn.name
+            };
+            fireEvent(this.pageRef, "changecolumn", info);
+            this.cards.push(new Card(cardId, this.rec.Name, this.rec.CardColumn__c, this.rec.Description__c));
+          }
+
+
+        }
         this.rec.Name = "";
         this.rec.CardColumn__c = "";
         this.rec.Description__c = "";
@@ -113,7 +130,6 @@ export default class CardColumn extends LightningElement {
       })
 
       .catch(error => {
-        this.message = undefined;
         this.error = error;
         this.dispatchEvent(
           new ShowToastEvent({
@@ -125,11 +141,6 @@ export default class CardColumn extends LightningElement {
         console.log("error", JSON.stringify(this.error));
       });
   }
-
-  @wire(CurrentPageReference) pageRef;
-
-  @track cards = [];
-  @api columninfo;
 
   connectedCallback() {
     registerListener("draganddrop", this.handleDragAndDrop, this);
@@ -140,13 +151,14 @@ export default class CardColumn extends LightningElement {
   disconnectedCallback() {
     unregisterAllListeners(this);
   }
-  updateCardInfo(card){
-    this.rec.Name = card.name;
-    this.rec.CardColumn__c =card.columnId;
-    this.rec.Description__c = card.description;
 
-    this.updateCardItem(card.id);
+  updateCardInfo(updatedCard) {
+    this.rec.Name = updatedCard.newCard.name;
+    this.rec.CardColumn__c = updatedCard.newCard.columnId;
+    this.rec.Description__c = updatedCard.newCard.description;
+    this.updateCardItem(updatedCard.newCard.id, updatedCard.oldColumn);
   }
+
   handleDragOver(evt) {
     evt.preventDefault();
   }
@@ -171,24 +183,33 @@ export default class CardColumn extends LightningElement {
     info.draggedCard.card.columnId = info.targetColumn.id;
     this.rec.Name = info.draggedCard.card.name;
     this.rec.CardColumn__c = info.draggedCard.card.columnId;
-    this.rec.Description__c = "";
+    this.rec.Description__c = info.draggedCard.card.description;
 
     this.updateCardItem(info.draggedCard.card.id);
 
-    if (info.draggedCard.cardColumn.id === this.columninfo.id && info.targetColumn.id !== this.columninfo.id) {
-      let ind = this.cards.findIndex((element, index, array) => {
+    if (this.isStartColumn(info)) {
+      const ind = this.cards.findIndex((element, index, array) => {
         if (element.id === info.draggedCard.card.id) {
           return true;
         }
       });
       this.cards.splice(ind, 1);
-    } else if (info.targetColumn.id === this.columninfo.id && info.draggedCard.cardColumn.id !== this.columninfo.id) {
+
+    } else if (this.isTargetColumn(info)) {
       this.cards.push(info.draggedCard.card);
       fireEvent(this.pageRef, "dragdropmenu", info);
     }
   }
 
-  handleCardClick() {
+  isStartColumn(info) {
+    return info.draggedCard.cardColumn.id === this.columninfo.id && info.targetColumn.id !== this.columninfo.id;
+  }
+
+  isTargetColumn(info) {
+    return info.targetColumn.id === this.columninfo.id && info.draggedCard.cardColumn.id !== this.columninfo.id;
+  }
+
+  handleCard() {
     fireEvent(this.pageRef, "showmodalcard", this.columninfo);
 
   }
@@ -197,8 +218,9 @@ export default class CardColumn extends LightningElement {
     if (newCardInfo.cardColumn.id === this.columninfo.id) {
       this.rec.Name = newCardInfo.cardName;
       this.rec.CardColumn__c = this.columninfo.id;
+      this.rec.Description__c = "";
       this.insertCardItem();
-      let card = new Card(this.id, newCardInfo.cardName, this.columninfo.id);
+      const card = new Card(this.id, newCardInfo.cardName, this.columninfo.id);
       this.cards.push(card);
       fireEvent(this.pageRef, "addcardclick", newCardInfo);
     }
@@ -206,13 +228,12 @@ export default class CardColumn extends LightningElement {
   }
 
   handleRemoveCard(event) {
-    let ind = this.cards.findIndex((element, index, array) => {
+    const ind = this.cards.findIndex((element, index, array) => {
       if (element.id === event.detail.id) {
         return true;
       }
     });
     this.deleteCardItem(event.detail.id, ind);
-    //this.cards.splice(ind, 1);
   }
 
   handleRemoveColumn() {

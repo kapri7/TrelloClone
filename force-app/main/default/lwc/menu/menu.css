@@ -16,3 +16,7 @@ h2{
 p{
     margin-left: 20px
 }
+.slds-scrollable_y{
+    height:34.5rem;
+    width:auto
+}

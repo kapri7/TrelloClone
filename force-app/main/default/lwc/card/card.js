@@ -3,7 +3,7 @@
  */
 
 import { LightningElement, api, wire } from "lwc";
-import { fireEvent } from "c/pubsub";
+import { fireEvent,registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 
 export default class Card extends LightningElement {
@@ -11,13 +11,23 @@ export default class Card extends LightningElement {
   @wire(CurrentPageReference) pageRef;
 
   @api cardcolumn;
+  connectedCallback() {
+    registerListener("updatecardinfo", this.handleUpdateCardName, this);
 
-  deleteCardClick() {
+  }
+  handleUpdateCardName(card){
+    if(this.card.id === card.id)
+    this.card = card;
+  }
+  disconnectedCallback() {
+    unregisterAllListeners(this);
+  }
+  deleteCard() {
     const event = new CustomEvent("deletecardclick", {
       detail: this.card
     });
     this.dispatchEvent(event);
-    let cardInfo = {
+    const cardInfo = {
       card: this.card,
       cardColumn: this.cardcolumn
     };
