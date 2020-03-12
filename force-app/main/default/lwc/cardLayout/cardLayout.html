@@ -4,7 +4,7 @@
             <template for:each={cardColumns} for:item="cardColumn">
                 <lightning-layout-item size="3" class="slds-p-around_x-small" key={cardColumn}>
 
-                    <c-card-column columninfo={cardColumn} ondeletecolumn={deleteCardColumn}
+                    <c-card-column board={board} columninfo={cardColumn} ondeletecolumn={deleteCardColumn}
                                    onlistitemdrag={handleListItemDrag} onitemdrop={handleItemDrop}></c-card-column>
 
                 </lightning-layout-item>
@@ -13,7 +13,7 @@
                               class="slds-m-left_x-small"></lightning-button>
         </lightning-layout>
     </div>
-    <c-card-modal-box></c-card-modal-box>
-    <c-column-modal-box ></c-column-modal-box>
+    <c-card-modal-box board={board}></c-card-modal-box>
+    <c-column-modal-box board={board}></c-column-modal-box>
     <c-card-detail ></c-card-detail>
 </template>

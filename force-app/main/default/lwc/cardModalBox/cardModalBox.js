@@ -2,7 +2,7 @@
  * Created by IvanSteniakin on 3/5/2020.
  */
 
-import { LightningElement, track, wire } from "lwc";
+import { LightningElement, track, wire, api } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 
@@ -11,6 +11,8 @@ export default class CardModalBox extends LightningElement {
   @track cardName = "";
   @wire(CurrentPageReference) pageRef;
   cardColumn;
+  @api board;
+
   connectedCallback() {
     registerListener("showmodalcard", this.openModal, this);
   }
@@ -19,17 +21,20 @@ export default class CardModalBox extends LightningElement {
     unregisterAllListeners(this);
   }
 
-  handleCardNameChange(event){
+  handleCardNameChange(event) {
     this.cardName = event.target.value;
   }
 
-  openModal(cardColumn) {
-    this.openModel = true;
-    this.cardColumn = cardColumn;
+  openModal(info) {
+    if (info.board.id === this.board.id) {
+      this.openModel = true;
+      this.cardColumn = info.cardColumn;
+    }
   }
 
   closeModal() {
     this.openModel = false;
+    this.cardName = "";
   }
 
   saveMethod() {

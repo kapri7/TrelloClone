@@ -12,7 +12,7 @@ export default class Card extends LightningElement {
 
   @api cardcolumn;
   connectedCallback() {
-    registerListener("updatecardinfo", this.handleUpdateCardName, this);
+    registerListener("updatecardname", this.handleUpdateCardName, this);
 
   }
   handleUpdateCardName(card){

@@ -2,53 +2,71 @@
  * Created by IvanSteniakin on 2/25/2020.
  */
 
-import { LightningElement, track, wire } from "lwc";
+import { LightningElement, track, wire, api } from "lwc";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 import getAllColumns from "@salesforce/apex/CardColumnController.getAllColumns";
 import insertNewColumn from "@salesforce/apex/CardColumnController.insertNewColumn";
 import deleteColumn from "@salesforce/apex/CardColumnController.deleteColumn";
-import LOG_OBJECT from "@salesforce/schema/CardColumn__c";
-import NAME_FIELD from "@salesforce/schema/CardColumn__c.Name";
-import ID_FIELD from "@salesforce/schema/CardColumn__c.Id";
-import DASHBOARD_FIELD from "@salesforce/schema/CardColumn__c.Dashboard__c";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 
 class Column {
-  constructor(id, name) {
+  constructor(id, name, board) {
     this.id = id;
     this.name = name;
+    this.board = board;
   }
 }
 
 
 export default class CardLayout extends LightningElement {
-  @track name = NAME_FIELD;
-  @track id = ID_FIELD;
-  @track dashboard = DASHBOARD_FIELD;
+  @track cardColumns = [];
+  currentDragCard;
+  currentDropColumn;
 
-  rec = {
-    Name: this.name
-    //Dashboard__c: this.dashboard
-  };
+  @wire(CurrentPageReference) pageRef;
+  @api board;
+  connectedCallback() {
+    registerListener("addcolumnname", this.insertColumn, this);
+    this.handleActive();
+  }
 
-  @wire(getAllColumns)
+  disconnectedCallback() {
+    unregisterAllListeners(this);
+  }
+  handleActive() {
+    getAllColumns()
+      .then(result => {
+        for (let i of result) {
+
+          if (i.Dashboard__c === this.board.id) {
+            const column = new Column(i.Id, i.Name, i.Dashboard__c);
+            this.cardColumns.push(column);
+          }
+        }
+      });
+  }
+
+  /*@wire(getAllColumns)
   getColumnInform(result) {
     if (result.data) {
       for (let i of result.data) {
-        const column = new Column(i.Id, i.Name);
-        this.cardColumns.push(column);
+
+        if (i.Dashboard__c === this.board.id) {
+          const column = new Column(i.Id, i.Name, i.Dashboard__c);
+          this.cardColumns.push(column);
+        }
       }
     }
-  }
+  }*/
 
-  insertColumnItem() {
-    insertNewColumn({ cardColumn: this.rec })
+  insertColumnItem(column) {
+    insertNewColumn({ cardColumn: column })
       .then(result => {
-        const column = new Column(result.Id, this.rec.Name);
+        const column = new Column(result.Id, result.Name, result.Dashboard__c);
         this.cardColumns.push(column);
-
+        fireEvent(this.pageRef, "addcardcolumnclick", result.Name);
         //console.log(JSON.stringify(result));
         //console.log("result", this.message);
       })
@@ -69,6 +87,7 @@ export default class CardLayout extends LightningElement {
   deleteColumnItem(id, itemIndex) {
     deleteColumn({ cardColumnId: id })
       .then(result => {
+        alert(itemIndex);
         this.cardColumns.splice(itemIndex, 1);
         //console.log(JSON.stringify(result));
         //console.log("result", this.message);
@@ -87,28 +106,20 @@ export default class CardLayout extends LightningElement {
       });
   }
 
-  @wire(CurrentPageReference) pageRef;
 
-  connectedCallback() {
-    registerListener("addcolumnname", this.addColumn, this);
-  }
 
-  disconnectedCallback() {
-    unregisterAllListeners(this);
-  }
-
-  @track cardColumns = [];
-  currentDragCard;
-  currentDropColumn;
 
   handleCardColumn() {
-    fireEvent(this.pageRef, "showmodalcolumn",null);
+    fireEvent(this.pageRef, "showmodalcolumn", this.board);
   }
 
-  addColumn(columnName) {
-    fireEvent(this.pageRef, "addcardcolumnclick", columnName);
-    this.rec.Name = columnName;
-    this.insertColumnItem();
+  insertColumn(column) {
+    const newColumn = {
+      Name: column.name,
+      Dashboard__c: column.dashboard
+    };
+    if(this.board.id === column.dashboard)
+    this.insertColumnItem(newColumn);
   }
 
   deleteCardColumn(event) {

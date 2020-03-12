@@ -9,11 +9,6 @@ import getAllCards from "@salesforce/apex/CardController.getAllCards";
 import insertNewCard from "@salesforce/apex/CardController.insertNewCard";
 import deleteCard from "@salesforce/apex/CardController.deleteCard";
 import updateCard from "@salesforce/apex/CardController.updateCard";
-import LOG_OBJECT from "@salesforce/schema/Card__c";
-import NAME_FIELD from "@salesforce/schema/Card__c.Name";
-import ID_FIELD from "@salesforce/schema/Card__c.Id";
-import CARDCOLUMN_FIELD from "@salesforce/schema/Card__c.CardColumn__c";
-import DESCRIPTION_FIELD from "@salesforce/schema/Card__c.Description__c";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 
@@ -27,27 +22,40 @@ class Card {
 }
 
 export default class CardColumn extends LightningElement {
-  @track name = NAME_FIELD;
-  @track id = ID_FIELD;
-  @track cardcolumn = CARDCOLUMN_FIELD;
-  @track description = DESCRIPTION_FIELD;
+
   @wire(CurrentPageReference) pageRef;
 
   @track cards = [];
   @api columninfo;
+  @api board;
+  connectedCallback() {
+    registerListener("draganddrop", this.handleDragAndDrop, this);
+    registerListener("addcardname", this.insertCard, this);
+    registerListener("updatecardinfo", this.updateCardInfo, this);
+    this.handleActive();
+  }
 
+  disconnectedCallback() {
+    unregisterAllListeners(this);
+  }
+  handleActive(){
+    getAllCards()
+      .then(result => {
+        for (let i of result) {
+          if (i.CardColumn__c === this.columninfo.id) {
+            const card = new Card(i.Id, i.Name, i.CardColumn__c, i.Description__c);
+            this.cards.push(card);
+          }
 
-  rec = {
-    Name: this.name,
-    CardColumn__c: this.cardcolumn,
-    Description__c: this.description
-  };
+        }
+      })
+  }
 
+  /*
   @wire(getAllCards)
   getCardInform(result) {
     if (result.data) {
       for (let i of result.data) {
-        this.id = i.Id;
         if (i.CardColumn__c === this.columninfo.id) {
           const card = new Card(i.Id, i.Name, i.CardColumn__c, i.Description__c);
           this.cards.push(card);
@@ -55,13 +63,15 @@ export default class CardColumn extends LightningElement {
 
       }
     }
-  }
+  }*/
 
-  insertCardItem() {
-    insertNewCard({ card: this.rec })
+  insertCardItem(newCard) {
+    insertNewCard({ card: newCard })
       .then(result => {
-        console.log(JSON.stringify(result));
-        console.log("result", this.message);
+        const card = new Card(result.Id, result.Name, result.CardColumn__c);
+        this.cards.push(card);
+        //console.log(JSON.stringify(result));
+        //console.log("result", this.message);
       })
       .catch(error => {
         this.error = error;
@@ -80,8 +90,8 @@ export default class CardColumn extends LightningElement {
     deleteCard({ cardId: id })
       .then(result => {
         this.cards.splice(itemIndex, 1);
-        console.log(JSON.stringify(result));
-        console.log("result", this.message);
+        //console.log(JSON.stringify(result));
+        //console.log("result", this.message);
       })
 
       .catch(error => {
@@ -97,36 +107,31 @@ export default class CardColumn extends LightningElement {
       });
   }
 
-  updateCardItem(cardId, oldColumn = "") {
-    updateCard({ cardId: cardId, newCard: this.rec })
+  updateCardItem(card, oldColumn = "") {
+    updateCard({ cardId: card.Id, newCard: card })
       .then(result => {
         const ind = this.cards.findIndex((element, index, array) => {
-          if (element.id === cardId) {
+          if (element.id === card.Id) {
             return true;
           }
         });
-        fireEvent(this.pageRef, "updateCardName", this.cards[ind]);
-        if (oldColumn !== "") {
+        fireEvent(this.pageRef, "updatecardname", this.cards[ind]);
+        if (oldColumn !== "" && card.CardColumn__c !== oldColumn.id) {
           if (this.columninfo.id === oldColumn.id) {
 
             this.cards.splice(ind, 1);
-          } else if (this.columninfo.id === this.rec.CardColumn__c) {
+          } else if (this.columninfo.id === card.CardColumn__c) {
             const info = {
-              cardName: this.rec.Name,
+              cardName: card.Name,
               destinationColumn: this.columninfo.name,
               startColumn: oldColumn.name
             };
             fireEvent(this.pageRef, "changecolumn", info);
-            this.cards.push(new Card(cardId, this.rec.Name, this.rec.CardColumn__c, this.rec.Description__c));
+            this.cards.push(new Card(card.Id, card.Name, card.CardColumn__c, card.Description__c));
           }
-
-
         }
-        this.rec.Name = "";
-        this.rec.CardColumn__c = "";
-        this.rec.Description__c = "";
-        console.log(JSON.stringify(result));
-        console.log("result", this.message);
+        // console.log(JSON.stringify(result));
+        // console.log("result", this.message);
       })
 
       .catch(error => {
@@ -142,21 +147,16 @@ export default class CardColumn extends LightningElement {
       });
   }
 
-  connectedCallback() {
-    registerListener("draganddrop", this.handleDragAndDrop, this);
-    registerListener("addcardname", this.addCard, this);
-    registerListener("updatecardinfo", this.updateCardInfo, this);
-  }
-
-  disconnectedCallback() {
-    unregisterAllListeners(this);
-  }
-
   updateCardInfo(updatedCard) {
-    this.rec.Name = updatedCard.newCard.name;
-    this.rec.CardColumn__c = updatedCard.newCard.columnId;
-    this.rec.Description__c = updatedCard.newCard.description;
-    this.updateCardItem(updatedCard.newCard.id, updatedCard.oldColumn);
+
+    const newCard = {
+      Name: updatedCard.newCard.name,
+      CardColumn__c: updatedCard.newCard.columnId,
+      Description__c: updatedCard.newCard.description,
+      Id: updatedCard.newCard.id
+    };
+
+      this.updateCardItem(newCard, updatedCard.oldColumn);
   }
 
   handleDragOver(evt) {
@@ -181,11 +181,14 @@ export default class CardColumn extends LightningElement {
 
   handleDragAndDrop(info) {
     info.draggedCard.card.columnId = info.targetColumn.id;
-    this.rec.Name = info.draggedCard.card.name;
-    this.rec.CardColumn__c = info.draggedCard.card.columnId;
-    this.rec.Description__c = info.draggedCard.card.description;
 
-    this.updateCardItem(info.draggedCard.card.id);
+    const newCard = {
+      Name: info.draggedCard.card.name,
+      CardColumn__c: info.draggedCard.card.columnId,
+      Description__c: info.draggedCard.card.description,
+      Id: info.draggedCard.card.id
+    };
+    this.updateCardItem(newCard);
 
     if (this.isStartColumn(info)) {
       const ind = this.cards.findIndex((element, index, array) => {
@@ -210,18 +213,23 @@ export default class CardColumn extends LightningElement {
   }
 
   handleCard() {
-    fireEvent(this.pageRef, "showmodalcard", this.columninfo);
-
+    const info = {
+      cardColumn: this.columninfo,
+      board : this.board
+    };
+    fireEvent(this.pageRef, "showmodalcard", info);
   }
 
-  addCard(newCardInfo) {
+  insertCard(newCardInfo) {
     if (newCardInfo.cardColumn.id === this.columninfo.id) {
-      this.rec.Name = newCardInfo.cardName;
-      this.rec.CardColumn__c = this.columninfo.id;
-      this.rec.Description__c = "";
-      this.insertCardItem();
-      const card = new Card(this.id, newCardInfo.cardName, this.columninfo.id);
-      this.cards.push(card);
+
+      const newCard = {
+        Name: newCardInfo.cardName,
+        CardColumn__c: this.columninfo.id,
+        Description__c: ""
+      };
+
+      this.insertCardItem(newCard);
       fireEvent(this.pageRef, "addcardclick", newCardInfo);
     }
 

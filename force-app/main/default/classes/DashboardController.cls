@@ -5,7 +5,9 @@
 public with sharing class DashboardController {
     @AuraEnabled(Cacheable=true)
     public static Dashboard__c[] getAllDashboards() {
-        return [SELECT Id, Name
-        FROM Dashboard__c LIMIT 50];
+        return [
+                SELECT Id, Name
+                FROM Dashboard__c
+        ];
     }
 }

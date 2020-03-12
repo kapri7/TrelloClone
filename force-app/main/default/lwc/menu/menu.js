@@ -3,16 +3,14 @@ import { CurrentPageReference } from "lightning/navigation";
 import { registerListener, unregisterAllListeners } from "c/pubsub";
 import getAllLogItems from "@salesforce/apex/LogItemController.getAllLogItems";
 import insertNewLogItem from "@salesforce/apex/LogItemController.insertNewLogItem";
-import LOG_OBJECT from '@salesforce/schema/LogItem__c';
-import NAME_FIELD from "@salesforce/schema/LogItem__c.Name";
-import DATE_FIELD from "@salesforce/schema/LogItem__c.Date__c";
-import MESSAGE_FIELD from "@salesforce/schema/LogItem__c.Message__c";
+
 
 class ActionLogItem {
 
-  constructor(date, message) {
+  constructor(date, message, name = "default") {
     this.date = date;
     this.message = message;
+    this.name = name;
   }
 }
 
@@ -20,17 +18,6 @@ export default class MenuComponent extends LightningElement {
 
   @wire(CurrentPageReference) pageRef;
   @track greeting = "Test";
-
-  @track name = NAME_FIELD;
-  @track message = MESSAGE_FIELD;
-  @track dateLog = DATE_FIELD;
-
-  rec = {
-    Name: this.name,
-    Message__c: this.message,
-    Date__c: this.dateLog
-  };
-
 
   handleGreetingChange(event) {
     this.greeting = event.target.value;
@@ -55,12 +42,18 @@ export default class MenuComponent extends LightningElement {
     }
   }
 
-  insertLogItem() {
-    insertNewLogItem({ logItem: this.rec })
+  insertLogItem(actionLogItem) {
+    const record = {
+      Name: actionLogItem.name,
+      Date__c: actionLogItem.date,
+      Message__c: actionLogItem.message
+    };
+
+    insertNewLogItem({ logItem: record })
       .then(result => {
 
         //console.log(JSON.stringify(result));
-       // console.log("result", this.message);
+        // console.log("result", this.message);
       })
       .catch(error => {
         this.error = error;
@@ -81,17 +74,15 @@ export default class MenuComponent extends LightningElement {
     unregisterAllListeners(this);
   }
 
-  displayLogMessage(message){
+  displayLogMessage(message) {
     const currentDateTime = new Date().getTime();
     const actionLogItem = new ActionLogItem(currentDateTime, message);
     this.actions.unshift(actionLogItem);
-    this.rec.Name = "default";
-    this.rec.Date__c = currentDateTime;
-    this.rec.Message__c = message;
-    this.insertLogItem();
+
+    this.insertLogItem(actionLogItem);
   }
 
-  handleChangeColumn(info){
+  handleChangeColumn(info) {
     const message = "User *username* moved card " + info.cardName + " from list " + info.startColumn + " to list " + info.destinationColumn + ".";
     this.displayLogMessage(message);
   }
@@ -102,7 +93,7 @@ export default class MenuComponent extends LightningElement {
   }
 
   handleAddCardColumn(cardColumnName) {
-    const message = 'User *username* added new list ' + cardColumnName + '!';
+    const message = "User *username* added new list " + cardColumnName + "!";
     this.displayLogMessage(message);
 
   }
