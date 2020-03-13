@@ -1,6 +1,6 @@
 <template>
-    <div class="droppable drop-container" ondragover={handleDragOver} ondrop={handleDrop}>
-        <div class="slds-scrollable_y">
+    <div class="droppable drop-container slds-scrollable_y" ondragover={handleDragOver} ondrop={handleDrop} >
+        <div >
             <lightning-card title={columninfo.name} icon-name="custom:custom13">
                 <lightning-button-icon icon-name="utility:close" variant="container" alternative-text="Remove list" slot="actions"
                                        class="slds-m-right_xx-small" title="Remove list"

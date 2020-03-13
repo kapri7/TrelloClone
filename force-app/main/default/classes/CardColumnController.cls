@@ -14,7 +14,6 @@ public with sharing class CardColumnController {
     @AuraEnabled
     public static CardColumn__c insertNewColumn(CardColumn__c cardColumn) {
         System.debug(JSON.serialize(cardColumn));
-       // cardColumn.Dashboard__c = 'a003X000015oBdQQAU';
         insert cardColumn;
         return cardColumn;
     }

@@ -29,13 +29,14 @@ export default class CardLayout extends LightningElement {
   @api board;
   connectedCallback() {
     registerListener("addcolumnname", this.insertColumn, this);
-    this.handleActive();
+    this.fetchData();
   }
 
   disconnectedCallback() {
     unregisterAllListeners(this);
   }
-  handleActive() {
+
+  fetchData() {
     getAllColumns()
       .then(result => {
         for (let i of result) {
@@ -48,25 +49,12 @@ export default class CardLayout extends LightningElement {
       });
   }
 
-  /*@wire(getAllColumns)
-  getColumnInform(result) {
-    if (result.data) {
-      for (let i of result.data) {
-
-        if (i.Dashboard__c === this.board.id) {
-          const column = new Column(i.Id, i.Name, i.Dashboard__c);
-          this.cardColumns.push(column);
-        }
-      }
-    }
-  }*/
-
   insertColumnItem(column) {
     insertNewColumn({ cardColumn: column })
       .then(result => {
         const column = new Column(result.Id, result.Name, result.Dashboard__c);
         this.cardColumns.push(column);
-        fireEvent(this.pageRef, "addcardcolumnclick", result.Name);
+        fireEvent(this.pageRef, "addcardcolumnclick", result);
         //console.log(JSON.stringify(result));
         //console.log("result", this.message);
       })
@@ -129,7 +117,7 @@ export default class CardLayout extends LightningElement {
       }
     });
     this.deleteColumnItem(event.detail.id, ind);
-    fireEvent(this.pageRef, "deletecolumn", event.detail.name);
+    fireEvent(this.pageRef, "deletecolumn", event.detail);
 
   }
 

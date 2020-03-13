@@ -15,6 +15,7 @@ class Dashboard {
 export default class BoardList extends LightningElement {
   @track boards = [];
 
+
   @wire(getAllDashboards)
   getDashboardInform(result) {
     if (result.data) {

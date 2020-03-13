@@ -8,7 +8,10 @@
     <lightning-tabset variant="scoped" class="slds-scrollable_x">
         <template for:each={boards} for:item="board">
             <lightning-tab label={board.name} key={board}>
-                <c-card-layout board = {board}></c-card-layout>
+                    <lightning-layout >
+                    <c-card-layout board={board}></c-card-layout>
+                    <c-menu board={board}></c-menu>
+                    </lightning-layout>
             </lightning-tab>
         </template>
     </lightning-tabset>

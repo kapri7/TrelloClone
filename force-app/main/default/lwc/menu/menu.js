@@ -1,57 +1,55 @@
-import { LightningElement, track, wire } from "lwc";
+import { LightningElement, track, wire, api } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
 import { registerListener, unregisterAllListeners } from "c/pubsub";
 import getAllLogItems from "@salesforce/apex/LogItemController.getAllLogItems";
 import insertNewLogItem from "@salesforce/apex/LogItemController.insertNewLogItem";
-
+import getCurrentUser from "@salesforce/apex/TrelloController.getCurrentUser";
+import Id from "@salesforce/user/Id";
 
 class ActionLogItem {
 
-  constructor(date, message, name = "default") {
+  constructor(date, message, dashboard) {
     this.date = date;
     this.message = message;
-    this.name = name;
+    this.name = dashboard.name;
+    this.dashboard = dashboard.id;
   }
 }
 
 export default class MenuComponent extends LightningElement {
 
   @wire(CurrentPageReference) pageRef;
-  @track greeting = "Test";
-
-  handleGreetingChange(event) {
-    this.greeting = event.target.value;
-  }
-
-  get capitalizedGreeting() {
-    return `About dashboard ${this.greeting}!`;
-  }
-
-
   @track actions = [];
+  @api board;
+  username;
 
-  @wire(getAllLogItems)
-  getLogInform(result) {
-    if (result.data) {
-      for (let i of result.data) {
-        const message = i.Message__c;
-        const date = i.Date__c;
-        const actionLogItem = new ActionLogItem(date, message);
-        this.actions.unshift(actionLogItem);
-      }
-    }
+  connectedCallback() {
+    registerListener("addcardclick", this.handleAddCard, this);
+    registerListener("addcardcolumnclick", this.handleAddCardColumn, this);
+    registerListener("deletecardclick", this.handleDeleteCard, this);
+    registerListener("deletecolumn", this.handleDeleteRow, this);
+    registerListener("dragdropmenu", this.handleDragDropLog, this);
+    registerListener("changecolumn", this.handleChangeColumn, this);
+    this.handleChooseBoard();
+  }
+
+  disconnectedCallback() {
+    unregisterAllListeners(this);
+    this.actions = [];
   }
 
   insertLogItem(actionLogItem) {
     const record = {
       Name: actionLogItem.name,
       Date__c: actionLogItem.date,
-      Message__c: actionLogItem.message
+      Message__c: actionLogItem.message,
+      Dashboard__c: this.board.id
     };
 
     insertNewLogItem({ logItem: record })
       .then(result => {
 
+        this.actions.unshift(actionLogItem);
         //console.log(JSON.stringify(result));
         // console.log("result", this.message);
       })
@@ -61,55 +59,71 @@ export default class MenuComponent extends LightningElement {
       });
   }
 
-  connectedCallback() {
-    registerListener("addcardclick", this.handleAddCard, this);
-    registerListener("addcardcolumnclick", this.handleAddCardColumn, this);
-    registerListener("deletecardclick", this.handleDeleteCard, this);
-    registerListener("deletecolumn", this.handleDeleteRow, this);
-    registerListener("dragdropmenu", this.handleDragDropLog, this);
-    registerListener("changecolumn", this.handleChangeColumn, this);
-  }
-
-  disconnectedCallback() {
-    unregisterAllListeners(this);
-  }
-
   displayLogMessage(message) {
     const currentDateTime = new Date().getTime();
-    const actionLogItem = new ActionLogItem(currentDateTime, message);
-    this.actions.unshift(actionLogItem);
-
+    const actionLogItem = new ActionLogItem(currentDateTime, message, this.board.id);
     this.insertLogItem(actionLogItem);
   }
 
+  handleChooseBoard() {
+    getCurrentUser({userId:Id})
+      .then(result =>{
+        this.username = result.Name;
+      });
+
+
+    getAllLogItems()
+      .then(result => {
+        for (let i of result) {
+          if (i.Dashboard__c === this.board.id) {
+            const message = i.Message__c;
+            const date = i.Date__c;
+            const actionLogItem = new ActionLogItem(date, message, this.board.id);
+            this.actions.unshift(actionLogItem);
+          }
+        }
+      });
+  }
+
   handleChangeColumn(info) {
-    const message = "User *username* moved card " + info.cardName + " from list " + info.startColumn + " to list " + info.destinationColumn + ".";
-    this.displayLogMessage(message);
+    if (info.startColumn.board === this.board.id) {
+      const message = "User " + this.username + " moved card " + info.cardName + " from list " + info.startColumn + " to list " + info.destinationColumn + ".";
+      this.displayLogMessage(message);
+    }
   }
 
   handleAddCard(cardInfo) {
-    const message = "User *username* added new card " + cardInfo.cardName + " at list " + cardInfo.cardColumn.name + " !";
-    this.displayLogMessage(message);
+    if (cardInfo.cardColumn.board === this.board.id) {
+      const message = "User " + this.username + " added new card " + cardInfo.cardName + " at list " + cardInfo.cardColumn.name + " !";
+      this.displayLogMessage(message);
+    }
   }
 
-  handleAddCardColumn(cardColumnName) {
-    const message = "User *username* added new list " + cardColumnName + "!";
-    this.displayLogMessage(message);
-
+  handleAddCardColumn(cardColumn) {
+    if (cardColumn.Dashboard__c === this.board.id) {
+      const message = "User " + this.username + " added new list " + cardColumn.Name + "!";
+      this.displayLogMessage(message);
+    }
   }
 
   handleDeleteCard(cardInfo) {
-    const message = "User *username* deleted card " + cardInfo.card.name + " at list " + cardInfo.cardColumn.name + "!";
-    this.displayLogMessage(message);
+    if (cardInfo.cardColumn.board === this.board.id) {
+      const message = "User " + this.username + " deleted card " + cardInfo.card.name + " at list " + cardInfo.cardColumn.name + "!";
+      this.displayLogMessage(message);
+    }
   }
 
-  handleDeleteRow(cardColumnName) {
-    const message = "User *username* deleted list " + cardColumnName + "!";
-    this.displayLogMessage(message);
+  handleDeleteRow(cardColumn) {
+    if (cardColumn.board === this.board.id) {
+      const message = "User " + this.username + " deleted list " + cardColumn.name + "!";
+      this.displayLogMessage(message);
+    }
   }
 
   handleDragDropLog(info) {
-    const message = "User *username* moved card " + info.draggedCard.card.name + " from list " + info.draggedCard.cardColumn.name + " to list " + info.targetColumn.name + ".";
-    this.displayLogMessage(message);
+    if (info.draggedCard.cardColumn.board === this.board.id) {
+      const message = "User " + this.username + " moved card " + info.draggedCard.card.name + " from list " + info.draggedCard.cardColumn.name + " to list " + info.targetColumn.name + ".";
+      this.displayLogMessage(message);
+    }
   }
 }

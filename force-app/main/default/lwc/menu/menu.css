@@ -6,17 +6,19 @@ hr {
     margin-right: auto;
     margin-left: auto;
     margin-top: 10px;
-    margin-bottom:10px;
-    background-color:#555;
+    margin-bottom: 10px;
+    background-color: #555;
 }
 
-h2{
+h2 {
     margin-left: 20px
 }
-p{
+
+p {
     margin-left: 20px
 }
-.slds-scrollable_y{
-    height:34.5rem;
-    width:auto
+
+.slds-scrollable_y {
+    height: 34.5rem;
+    width: 24rem
 }

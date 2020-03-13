@@ -44,6 +44,7 @@ export default class CardModalBox extends LightningElement {
         cardName: this.cardName
       };
       fireEvent(this.pageRef, "addcardname", newCardInfo);
+      this.dispatchEvent(new Event())
       this.cardName = "";
       this.closeModal();
     }
