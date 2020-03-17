@@ -10,4 +10,11 @@ public with sharing class DashboardController {
                 FROM Dashboard__c
         ];
     }
+
+    @AuraEnabled
+    public static Dashboard__c insertNewDashboard(Dashboard__c dashboard) {
+        System.debug(JSON.serialize(dashboard));
+        insert dashboard;
+        return dashboard;
+    }
 }

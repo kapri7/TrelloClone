@@ -4,6 +4,9 @@
 
 import { LightningElement, track, wire } from "lwc";
 import getAllDashboards from "@salesforce/apex/DashboardController.getAllDashboards";
+import insertNewDashboard from "@salesforce/apex/DashboardController.insertNewDashboard";
+import { fireEvent } from "c/pubsub";
+import { CurrentPageReference } from "lightning/navigation";
 
 class Dashboard {
   constructor(id, name) {
@@ -14,7 +17,7 @@ class Dashboard {
 
 export default class BoardList extends LightningElement {
   @track boards = [];
-
+  @wire(CurrentPageReference) pageRef;
 
   @wire(getAllDashboards)
   getDashboardInform(result) {
@@ -25,5 +28,25 @@ export default class BoardList extends LightningElement {
 
       }
     }
+  }
+
+  handleAddBoardClick() {
+    fireEvent(this.pageRef, "showmodalboard", null);
+  }
+
+  handleAddBoard(event) {
+    const dashboard = {
+      Name:event.detail
+    };
+
+    insertNewDashboard({dashboard:dashboard})
+      .then(result =>{
+        const board = new Dashboard(result.Id, result.Name);
+        this.boards.push(board);
+      })
+  }
+
+  handleAddUserClick() {
+    alert("Added user!");
   }
 }
