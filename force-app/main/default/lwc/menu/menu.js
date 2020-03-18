@@ -1,6 +1,6 @@
 import { LightningElement, track, wire, api } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
-import { registerListener, unregisterAllListeners } from "c/pubsub";
+import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import getAllLogItems from "@salesforce/apex/LogItemController.getAllLogItems";
 import insertNewLogItem from "@salesforce/apex/LogItemController.insertNewLogItem";
 import getCurrentUser from "@salesforce/apex/TrelloController.getCurrentUser";
@@ -38,6 +38,9 @@ export default class MenuComponent extends LightningElement {
     this.actions = [];
   }
 
+  handleBoardInfo(){
+    fireEvent(this.pageRef,"boardinfoclick",this.board)
+  }
   insertLogItem(actionLogItem) {
     const record = {
       Name: actionLogItem.name,
