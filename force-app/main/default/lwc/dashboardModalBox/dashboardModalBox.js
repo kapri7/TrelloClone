@@ -2,15 +2,15 @@
  * Created by IvanSteniakin on 3/18/2020.
  */
 
-import { LightningElement, track, wire } from "lwc";
+import { LightningElement, track, wire,api } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
-import { registerListener, unregisterAllListeners } from "c/pubsub";
+import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 
 export default class DashboardModalBox extends LightningElement {
   @track openModel;
   @track boardName = "";
   @wire(CurrentPageReference) pageRef;
-
+  @api board;
   connectedCallback() {
     registerListener("showmodalboard", this.openModal, this);
   }
@@ -23,7 +23,8 @@ export default class DashboardModalBox extends LightningElement {
     this.boardName = event.target.value;
   }
 
-  openModal() {
+  openModal(boardId) {
+    if(this.board.id === boardId)
       this.openModel = true;
   }
 
@@ -34,7 +35,11 @@ export default class DashboardModalBox extends LightningElement {
 
   saveMethod() {
     if (this.boardName !== "") {
-      this.dispatchEvent(new CustomEvent("addboard",{detail: this.boardName}));
+      const boardInfo = {
+        name:this.boardName,
+        thisTab: this.board.id
+      };
+      fireEvent(this.pageRef,"addboard",boardInfo);
       this.closeModal();
     }
   }

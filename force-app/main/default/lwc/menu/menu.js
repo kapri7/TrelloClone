@@ -5,6 +5,7 @@ import getAllLogItems from "@salesforce/apex/LogItemController.getAllLogItems";
 import insertNewLogItem from "@salesforce/apex/LogItemController.insertNewLogItem";
 import getCurrentUser from "@salesforce/apex/TrelloController.getCurrentUser";
 import Id from "@salesforce/user/Id";
+import insertNewDashboard from "@salesforce/apex/DashboardController.insertNewDashboard";
 
 class ActionLogItem {
 
@@ -30,6 +31,7 @@ export default class MenuComponent extends LightningElement {
     registerListener("deletecolumn", this.handleDeleteRow, this);
     registerListener("dragdropmenu", this.handleDragDropLog, this);
     registerListener("changecolumn", this.handleChangeColumn, this);
+    registerListener("addboard", this.handleAddBoard, this);
     this.handleChooseBoard();
   }
 
@@ -38,9 +40,37 @@ export default class MenuComponent extends LightningElement {
     this.actions = [];
   }
 
-  handleBoardInfo(){
-    fireEvent(this.pageRef,"boardinfoclick",this.board)
+  handleAddBoardClick() {
+    fireEvent(this.pageRef, "showmodalboard", this.board.id);
   }
+
+  handleAddBoard(event) {
+    if (this.board.id === event.thisTab) {
+      const dashboard = {
+        Name: event.name
+      };
+
+      insertNewDashboard({ dashboard: dashboard })
+        .then(result => {
+          this.dispatchEvent(new CustomEvent("newboard", { detail: { Id: result.Id, Name: result.Name } }));
+        });
+    }
+  }
+
+  handleAddUserClick() {
+    alert("Added user!");
+  }
+
+  handleBoardInfo() {
+    fireEvent(this.pageRef, "boardinfoclick", this.board);
+  }
+
+  handleBoardDelete() {
+    this.dispatchEvent(new CustomEvent("deleteboard", { detail: this.board.id }));
+  }
+
+  e;
+
   insertLogItem(actionLogItem) {
     const record = {
       Name: actionLogItem.name,
@@ -69,8 +99,8 @@ export default class MenuComponent extends LightningElement {
   }
 
   handleChooseBoard() {
-    getCurrentUser({userId:Id})
-      .then(result =>{
+    getCurrentUser({ userId: Id })
+      .then(result => {
         this.username = result.Name;
       });
 

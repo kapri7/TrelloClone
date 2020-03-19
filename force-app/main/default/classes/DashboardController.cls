@@ -8,6 +8,7 @@ public with sharing class DashboardController {
         return [
                 SELECT Id, Name
                 FROM Dashboard__c
+                ORDER BY CreatedDate
         ];
     }
 
@@ -16,5 +17,12 @@ public with sharing class DashboardController {
         System.debug(JSON.serialize(dashboard));
         insert dashboard;
         return dashboard;
+    }
+
+    @AuraEnabled
+    public static void deleteDashboard(Id dashboardId) {
+        System.debug(JSON.serialize(dashboardId));
+        Dashboard__c dashboard = [SELECT Id FROM Dashboard__c WHERE Id = :dashboardId];
+        delete dashboard;
     }
 }

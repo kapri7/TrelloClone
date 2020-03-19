@@ -4,11 +4,11 @@
 
 import { LightningElement, track, wire } from "lwc";
 import getAllDashboards from "@salesforce/apex/DashboardController.getAllDashboards";
-import insertNewDashboard from "@salesforce/apex/DashboardController.insertNewDashboard";
+import deleteDashboard from "@salesforce/apex/DashboardController.deleteDashboard";
 import { fireEvent } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 
-class Dashboard {
+export class Dashboard {
   constructor(id, name) {
     this.id = id;
     this.name = name;
@@ -29,24 +29,19 @@ export default class BoardList extends LightningElement {
       }
     }
   }
-
-  handleAddBoardClick() {
-    fireEvent(this.pageRef, "showmodalboard", null);
+  handleNewBoard(event){
+    const board = new Dashboard(event.detail.Id, event.detail.Name);
+    this.boards.push(board);
   }
-
-  handleAddBoard(event) {
-    const dashboard = {
-      Name:event.detail
-    };
-
-    insertNewDashboard({dashboard:dashboard})
-      .then(result =>{
-        const board = new Dashboard(result.Id, result.Name);
-        this.boards.push(board);
+  handleDeleteBoard(event){
+    deleteDashboard({dashboardId:event.detail})
+      .then(result=>{
+        const ind = this.boards.findIndex((element, index, array) => {
+          if (element.id === event.detail) {
+            return true;
+          }
+        });
+        this.boards.splice(ind,1);
       })
-  }
-
-  handleAddUserClick() {
-    alert("Added user!");
   }
 }

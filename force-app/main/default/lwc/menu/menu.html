@@ -1,24 +1,31 @@
 <template>
     <div class="slds-scrollable_y">
-    <lightning-card title=Menu icon-name="custom:custom12">
-        <lightning-button-icon icon-name="utility:threedots_vertical" variant="container" alternative-text="Board detail"
-                               slot="actions"
-                               class="slds-m-right_xx-small" title="Board detail"
-                               onclick={handleBoardInfo}></lightning-button-icon>
-        <hr>
-        <div class="slds-m-top_medium slds-m-bottom_x-large">
-            <h2 class="slds-text-heading_medium slds-m-bottom_medium">{board.name}</h2>
-
-            <p contenteditable="true">Type the description here... </p>
-        </div>
-        <div class="slds-m-around_medium">
-            <br/>
-            <h2 class="slds-text-heading_medium slds-m-bottom_medium">Actions</h2>
+        <lightning-card title=Menu icon-name="custom:custom12">
+            <lightning-button-menu alternative-text="Show menu" slot='actions' variant="border-filled"
+                                   tooltip="Settings" menu-alignment="right" icon-name="utility:settings"
+                                   class="slds-m-left_large">
+                <lightning-menu-item value="Add board" label="Add board"
+                                     onclick={handleAddBoardClick}></lightning-menu-item>
+                <lightning-menu-item value="Add user" label="Add user"
+                                     onclick={handleAddUserClick}></lightning-menu-item>
+                <lightning-menu-item value="Board info" label="Info" onclick={handleBoardInfo}></lightning-menu-item>
+                <lightning-menu-item value="Delete" label="Delete board"
+                                     onclick={handleBoardDelete}></lightning-menu-item>
+            </lightning-button-menu>
             <hr>
-        </div>
-        <template  iterator:it={actions}>
-            <c-action-item  key={it.value} actionitem={it.value.message} today = {it.value.date}></c-action-item>
-        </template>
-    </lightning-card>
+            <div class="slds-m-top_medium slds-m-bottom_x-large">
+                <h2 class="slds-text-heading_medium slds-m-bottom_medium">{board.name}</h2>
+
+                <p contenteditable="true">Type the description here... </p>
+            </div>
+            <div class="slds-m-around_medium">
+                <br/>
+                <h2 class="slds-text-heading_medium slds-m-bottom_medium">Actions</h2>
+                <hr>
+            </div>
+            <template iterator:it={actions}>
+                <c-action-item key={it.value} actionitem={it.value.message} today={it.value.date}></c-action-item>
+            </template>
+        </lightning-card>
     </div>
 </template>

@@ -4,23 +4,17 @@
 
 <!-- Board List -->
 <template>
-    <div class="backgroundInverse">
-            <lightning-button-menu alternative-text="Show menu" variant="border-filled" icon-name="utility:add">
-                <lightning-menu-item value="Add board" label="Add board" onclick={handleAddBoardClick}></lightning-menu-item>
-                <lightning-menu-item value="Add user" label="Add user" onclick={handleAddUserClick}></lightning-menu-item>
-            </lightning-button-menu>
-        </div>
     <lightning-tabset variant="scoped" class="slds-scrollable_x">
 
         <template for:each={boards} for:item="board">
             <lightning-tab label={board.name} key={board}>
                     <lightning-layout >
                     <c-card-layout board={board}></c-card-layout>
-                    <c-menu board={board}></c-menu>
+                    <c-menu board={board} onnewboard={handleNewBoard} ondeleteboard={handleDeleteBoard}></c-menu>
                     </lightning-layout>
             </lightning-tab>
         </template>
 
     </lightning-tabset>
-    <c-dashboard-modal-box onaddboard={handleAddBoard}></c-dashboard-modal-box>
+
 </template>
