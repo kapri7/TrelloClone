@@ -6,7 +6,7 @@ public with sharing class DashboardController {
     @AuraEnabled(Cacheable=true)
     public static Dashboard__c[] getAllDashboards() {
         return [
-                SELECT Id, Name
+                SELECT Id, Name,Description__c
                 FROM Dashboard__c
                 ORDER BY CreatedDate
         ];
@@ -24,5 +24,15 @@ public with sharing class DashboardController {
         System.debug(JSON.serialize(dashboardId));
         Dashboard__c dashboard = [SELECT Id FROM Dashboard__c WHERE Id = :dashboardId];
         delete dashboard;
+    }
+
+    @AuraEnabled
+    public static Dashboard__c updateDashboard(Dashboard__c newDashboard) {
+        System.debug(JSON.serialize(newDashboard));
+        Dashboard__c dashboard = [SELECT Id,Name,Description__c FROM Dashboard__c WHERE Id = :newDashboard.Id];
+        dashboard.Name = newDashboard.Name;
+        dashboard.Description__c = newDashboard.Description__c;
+        update dashboard;
+        return dashboard;
     }
 }

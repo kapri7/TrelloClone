@@ -35,12 +35,8 @@ export default class BoardDetail extends LightningElement {
   }
 
   saveMethod() {
-    const updatedBoard = {
-      newBoard: this.board,
-    };
-
-    fireEvent(this.pageRef, "updateboardinfo", updatedBoard);
-   this.closeModal()
+    fireEvent(this.pageRef, "updateboardinfo", this.board);
+    this.closeModal()
   }
 
   handleNameChange(event) {
