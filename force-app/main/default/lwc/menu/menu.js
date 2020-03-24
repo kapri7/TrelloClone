@@ -6,6 +6,7 @@ import insertNewLogItem from "@salesforce/apex/LogItemController.insertNewLogIte
 import getCurrentUser from "@salesforce/apex/TrelloController.getCurrentUser";
 import Id from "@salesforce/user/Id";
 import insertNewDashboard from "@salesforce/apex/DashboardController.insertNewDashboard";
+import addUserToBoard from "@salesforce/apex/DashboardController.addUserToBoard";
 
 class ActionLogItem {
 
@@ -53,12 +54,13 @@ export default class MenuComponent extends LightningElement {
       insertNewDashboard({ dashboard: dashboard })
         .then(result => {
           this.dispatchEvent(new CustomEvent("newboard", { detail: { Id: result.Id, Name: result.Name } }));
+          addUserToBoard({ dashboardId: result.Id, userID: Id });
         });
     }
   }
 
   handleAddUserClick() {
-    alert("Added user!");
+    fireEvent(this.pageRef, "showmodaluserboard", this.board.id);
   }
 
   handleBoardInfo() {

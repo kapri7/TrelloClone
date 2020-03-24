@@ -35,4 +35,19 @@ public with sharing class DashboardController {
         update dashboard;
         return dashboard;
     }
+
+    @AuraEnabled
+    public static void addUserToBoard(Id dashboardId,Id userID) {
+        System.debug(JSON.serialize(dashboardId));
+        UserBoard__c boardUser= new UserBoard__c();
+        boardUser.User__c = userID;
+        boardUser.Dashboard__c = dashboardId;
+        boardUser.Name = 'default';
+        insert boardUser;
+    }
+
+    @AuraEnabled
+    public static UserBoard__c[] getUserBoards() {
+        return [SELECT User__c,Dashboard__c FROM UserBoard__c];
+    }
 }
