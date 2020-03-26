@@ -10,7 +10,7 @@ export default class Card extends LightningElement {
   @api card;
   @wire(CurrentPageReference) pageRef;
 
-  @api cardcolumn;
+  @api cardColumn;
   connectedCallback() {
     registerListener("updatecardname", this.handleUpdateCardName, this);
 
@@ -29,7 +29,7 @@ export default class Card extends LightningElement {
     this.dispatchEvent(event);
     const cardInfo = {
       card: this.card,
-      cardColumn: this.cardcolumn
+      cardColumn: this.cardColumn
     };
     fireEvent(this.pageRef, "deletecardclick", cardInfo);
   }
@@ -37,7 +37,7 @@ export default class Card extends LightningElement {
   itemDragStart() {
     const cardInfo = {
       card: this.card,
-      cardColumn: this.cardcolumn
+      cardColumn: this.cardColumn
     };
     const event = new CustomEvent('itemdrag', {
       detail: cardInfo
@@ -49,7 +49,7 @@ export default class Card extends LightningElement {
   selectCardInfo(){
     const cardInfo = {
       card: this.card,
-      cardColumn: this.cardcolumn
+      cardColumn: this.cardColumn
     };
     fireEvent(this.pageRef, "cardinfoclick", cardInfo);
   }

@@ -1,0 +1,13 @@
+<!--
+ - Created by IvanSteniakin on 3/26/2020.
+ -->
+
+<!-- User Board -->
+<template>
+    <lightning-card title={userBoard.user.name} icon-name="custom:custom13">
+        <lightning-button-icon icon-name="utility:close" variant="container" alternative-text="Remove"
+                               slot="actions"
+                               class="slds-m-right_xx-small" title="Remove"
+                               onclick={handleRemoveUser}></lightning-button-icon>
+    </lightning-card>
+</template>

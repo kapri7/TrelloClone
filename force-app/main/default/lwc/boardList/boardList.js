@@ -6,7 +6,7 @@ import { LightningElement, track, wire } from "lwc";
 import getAllDashboards from "@salesforce/apex/DashboardController.getAllDashboards";
 import deleteDashboard from "@salesforce/apex/DashboardController.deleteDashboard";
 import updateDashboard from "@salesforce/apex/DashboardController.updateDashboard";
-import getUserBoards from "@salesforce/apex/DashboardController.getUserBoards";
+import getUserBoards from "@salesforce/apex/UserBoardController.getUserBoards";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import Id from "@salesforce/user/Id";
 import { CurrentPageReference } from "lightning/navigation";
@@ -48,8 +48,8 @@ export default class BoardList extends LightningElement {
         this.boards[ind].name = result.Name;
         this.boards[ind].description = result.Description__c;
 
-        this.boards.length = 0;
-        this.getDashboardInform();
+        //this.boards.length = 0;
+        //this.getDashboardInform();
       });
 
 
@@ -63,7 +63,6 @@ export default class BoardList extends LightningElement {
           .then(boards =>{
             for (let board of boards) {
               for(let userboard of userBoards){
-               // console.log(board.id);
                 if(board.Id === userboard.Dashboard__c && userboard.User__c === Id) {
                   const dashboard = new Dashboard(board.Id, board.Name, board.Description__c);
                   this.boards.push(dashboard);

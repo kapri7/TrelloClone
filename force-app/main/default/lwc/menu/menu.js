@@ -6,7 +6,7 @@ import insertNewLogItem from "@salesforce/apex/LogItemController.insertNewLogIte
 import getCurrentUser from "@salesforce/apex/TrelloController.getCurrentUser";
 import Id from "@salesforce/user/Id";
 import insertNewDashboard from "@salesforce/apex/DashboardController.insertNewDashboard";
-import addUserToBoard from "@salesforce/apex/DashboardController.addUserToBoard";
+import addUserToBoard from "@salesforce/apex/UserBoardController.addUserToBoard";
 
 class ActionLogItem {
 
@@ -20,6 +20,7 @@ class ActionLogItem {
 
 export default class MenuComponent extends LightningElement {
 
+  @track value = [];
   @wire(CurrentPageReference) pageRef;
   @track actions = [];
   @api board;
@@ -39,6 +40,21 @@ export default class MenuComponent extends LightningElement {
   disconnectedCallback() {
     unregisterAllListeners(this);
     this.actions = [];
+  }
+
+  get options() {
+    return [
+      { label: 'Show tasks assigned for me only', value: 'myTasks' },
+    ];
+  }
+
+  handleChange(e) {
+    let checkBoxInfo = {
+      status: e.detail.value.length,
+      boardId : this.board.id
+    };
+    this.value = e.detail.value;
+    fireEvent(this.pageRef,"checkboxtasks",checkBoxInfo)
   }
 
   handleAddBoardClick() {
@@ -71,8 +87,6 @@ export default class MenuComponent extends LightningElement {
     this.dispatchEvent(new CustomEvent("deleteboard", { detail: this.board.id }));
   }
 
-  e;
-
   insertLogItem(actionLogItem) {
     const record = {
       Name: actionLogItem.name,
@@ -83,10 +97,7 @@ export default class MenuComponent extends LightningElement {
 
     insertNewLogItem({ logItem: record })
       .then(result => {
-
         this.actions.unshift(actionLogItem);
-        //console.log(JSON.stringify(result));
-        // console.log("result", this.message);
       })
       .catch(error => {
         this.error = error;

@@ -12,6 +12,13 @@
                 <lightning-menu-item value="Delete" label="Delete board"
                                      onclick={handleBoardDelete}></lightning-menu-item>
             </lightning-button-menu>
+
+            <lightning-checkbox-group
+                    class="Checkbox"
+                    name="Checkbox"
+                    options={options}
+                    value={value}
+                    onchange={handleChange}></lightning-checkbox-group>
             <hr>
             <div class="slds-m-top_medium slds-m-bottom_x-large">
                 <h2 class="slds-text-heading_medium slds-m-bottom_medium">{board.name}</h2>

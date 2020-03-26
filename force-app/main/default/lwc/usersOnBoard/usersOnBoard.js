@@ -5,16 +5,16 @@
 import { api, LightningElement, track, wire } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
-import addUserToBoard from "@salesforce/apex/DashboardController.addUserToBoard";
+import addUserToBoard from "@salesforce/apex/UserBoardController.addUserToBoard";
 
 export default class UsersOnBoard extends LightningElement {
-  @track openModel;
+  @track openModal;
   @wire(CurrentPageReference) pageRef;
   @api board;
   @track user;
 
   connectedCallback() {
-    registerListener("showmodaluserboard", this.openModal, this);
+    registerListener("showmodaluserboard", this.open, this);
   }
 
   disconnectedCallback() {
@@ -22,13 +22,13 @@ export default class UsersOnBoard extends LightningElement {
   }
 
 
-  openModal(boardId) {
+  open(boardId) {
     if (this.board.id === boardId)
-      this.openModel = true;
+      this.openModal = true;
   }
 
   closeModal() {
-    this.openModel = false;
+    this.openModal = false;
   }
 
   handleUserChange(event) {

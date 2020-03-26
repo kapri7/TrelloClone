@@ -4,7 +4,7 @@
 
 <!-- Board Detail -->
 <template>
-    <template if:true={openModel}>
+    <template if:true={openModal}>
         <div class="demo-only">
             <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
                      aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
@@ -24,9 +24,15 @@
                                 <lightning-input-field field-name='Name' value={board.name} onchange={handleNameChange}></lightning-input-field>
                                 <lightning-input-field field-name='Description__c'
                                                        value={board.description} onchange={handleDescriptionChange}></lightning-input-field>
-                                <lightning-input-field field-name='CreatedDate'></lightning-input-field>
                             </div>
+
+                            <lightning-card title="Users">
+                                <template for:each={userBoards} for:item="userBoard">
+                                    <c-user-board key={userBoard} user-board = {userBoard} ondeleteuserfromboard={deleteUserFromBoard}></c-user-board>
+                                </template>
+                            </lightning-card>
                         </div>
+
                         <footer class="slds-modal__footer">
                             <lightning-button label="Cancel" variant="neutral" onclick={closeModal}></lightning-button>&nbsp;&nbsp;&nbsp;&nbsp;
                             <lightning-button label="Save" variant="brand" onclick={saveMethod}></lightning-button>

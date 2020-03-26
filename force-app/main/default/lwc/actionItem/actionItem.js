@@ -9,5 +9,5 @@ export default class ActionItem extends LightningElement {
   actionitem;
 
   @api
-  today;
+  createdDate;
 }

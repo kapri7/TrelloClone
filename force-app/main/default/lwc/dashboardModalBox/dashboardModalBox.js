@@ -7,12 +7,12 @@ import { CurrentPageReference } from "lightning/navigation";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 
 export default class DashboardModalBox extends LightningElement {
-  @track openModel;
+  @track openModal;
   @track boardName = "";
   @wire(CurrentPageReference) pageRef;
   @api board;
   connectedCallback() {
-    registerListener("showmodalboard", this.openModal, this);
+    registerListener("showmodalboard", this.open, this);
   }
 
   disconnectedCallback() {
@@ -23,13 +23,13 @@ export default class DashboardModalBox extends LightningElement {
     this.boardName = event.target.value;
   }
 
-  openModal(boardId) {
+  open(boardId) {
     if(this.board.id === boardId)
-      this.openModel = true;
+      this.openModal = true;
   }
 
   closeModal() {
-    this.openModel = false;
+    this.openModal = false;
     this.boardName = "";
   }
 

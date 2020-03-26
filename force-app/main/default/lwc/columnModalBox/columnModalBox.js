@@ -7,13 +7,13 @@ import { CurrentPageReference } from "lightning/navigation";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 
 export default class ColumnModalBox extends LightningElement {
-  @track openModel;
+  @track openModal;
   @track columnName = "";
   @wire(CurrentPageReference) pageRef;
   @api board;
 
   connectedCallback() {
-    registerListener("showmodalcolumn", this.openModal, this);
+    registerListener("showmodalcolumn", this.open, this);
   }
 
   disconnectedCallback() {
@@ -24,13 +24,13 @@ export default class ColumnModalBox extends LightningElement {
     this.columnName = event.target.value;
   }
 
-  openModal(board) {
+  open(board) {
     if(this.board.id === board.id)
-    this.openModel = true;
+    this.openModal = true;
   }
 
   closeModal() {
-    this.openModel = false;
+    this.openModal = false;
     this.columnName = "";
   }
 

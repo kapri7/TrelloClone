@@ -8,7 +8,7 @@ import { CurrentPageReference } from "lightning/navigation";
 
 export default class CardDetail extends LightningElement {
   @track card;
-  @track openModel;
+  @track openModal;
   @wire(CurrentPageReference) pageRef;
   previousColumn;
   @api board;
@@ -27,14 +27,14 @@ export default class CardDetail extends LightningElement {
 
   handleCardInfoClick(cardInfo) {
     if (cardInfo.cardColumn.board === this.board.id) {
-      this.openModel = true;
+      this.openModal = true;
       this.card = cardInfo.card;
       this.previousColumn = cardInfo.cardColumn;
     }
   }
 
   closeModal() {
-    this.openModel = false;
+    this.openModal = false;
   }
 
   saveMethod() {
@@ -44,7 +44,7 @@ export default class CardDetail extends LightningElement {
     };
 
     fireEvent(this.pageRef, "updatecardinfo", updatedCard);
-    this.openModel = false;
+    this.openModal = false;
   }
 
   handleNameChange(event) {
@@ -57,5 +57,9 @@ export default class CardDetail extends LightningElement {
 
   handleDescriptionChange(event) {
     this.card.description = event.target.value;
+  }
+
+  handleUserChange(event){
+    this.card.user = event.target.value;
   }
 }

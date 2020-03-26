@@ -20,15 +20,18 @@ class Column {
 }
 
 
-export default class CardLayout extends LightningElement {
+export default class BoardLayout extends LightningElement {
   @track cardColumns = [];
   currentDragCard;
   currentDropColumn;
 
   @wire(CurrentPageReference) pageRef;
   @api board;
+
+  @track isMyTasks = 0;
   connectedCallback() {
     registerListener("addcolumnname", this.insertColumn, this);
+    registerListener("checkboxtasks", this.showMyTasks, this);
     this.fetchData();
   }
 
@@ -49,14 +52,21 @@ export default class CardLayout extends LightningElement {
       });
   }
 
+  showMyTasks(checkBoxInfo){
+    if(this.board.id === checkBoxInfo.boardId){
+      this.cardColumns.length = 0;
+      this.isMyTasks = checkBoxInfo.status;
+      this.fetchData();
+      fireEvent(this.pageRef, "addonlymycards", checkBoxInfo);
+    }
+  }
+
   insertColumnItem(column) {
     insertNewColumn({ cardColumn: column })
       .then(result => {
         const column = new Column(result.Id, result.Name, result.Dashboard__c);
         this.cardColumns.push(column);
         fireEvent(this.pageRef, "addcardcolumnclick", result);
-        //console.log(JSON.stringify(result));
-        //console.log("result", this.message);
       })
 
       .catch(error => {
@@ -77,8 +87,6 @@ export default class CardLayout extends LightningElement {
       .then(result => {
         alert(itemIndex);
         this.cardColumns.splice(itemIndex, 1);
-        //console.log(JSON.stringify(result));
-        //console.log("result", this.message);
       })
 
       .catch(error => {

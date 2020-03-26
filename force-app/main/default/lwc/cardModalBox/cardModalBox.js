@@ -7,14 +7,14 @@ import { CurrentPageReference } from "lightning/navigation";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 
 export default class CardModalBox extends LightningElement {
-  @track openModel;
+  @track openModal;
   @track cardName = "";
   @wire(CurrentPageReference) pageRef;
   cardColumn;
   @api board;
 
   connectedCallback() {
-    registerListener("showmodalcard", this.openModal, this);
+    registerListener("showmodalcard", this.open, this);
   }
 
   disconnectedCallback() {
@@ -25,15 +25,15 @@ export default class CardModalBox extends LightningElement {
     this.cardName = event.target.value;
   }
 
-  openModal(info) {
+  open(info) {
     if (info.board.id === this.board.id) {
-      this.openModel = true;
+      this.openModal = true;
       this.cardColumn = info.cardColumn;
     }
   }
 
   closeModal() {
-    this.openModel = false;
+    this.openModal = false;
     this.cardName = "";
   }
 
