@@ -27,7 +27,7 @@ export default class BoardLayout extends LightningElement {
 
   @wire(CurrentPageReference) pageRef;
   @api board;
-
+  @api combinedCards;
   @track isMyTasks = 0;
   connectedCallback() {
     registerListener("addcolumnname", this.insertColumn, this);
@@ -40,16 +40,13 @@ export default class BoardLayout extends LightningElement {
   }
 
   fetchData() {
-    getAllColumns()
-      .then(result => {
-        for (let i of result) {
-
-          if (i.Dashboard__c === this.board.id) {
-            const column = new Column(i.Id, i.Name, i.Dashboard__c);
-            this.cardColumns.push(column);
-          }
-        }
-      });
+    let cardColumnIds = [];
+    for (let i of this.combinedCards) {
+      if (i.CardColumn__r.Dashboard__c=== this.board.id && !cardColumnIds.includes(i.CardColumn__c)) {
+        cardColumnIds.push(i.CardColumn__c);
+        this.cardColumns.push(new Column(i.CardColumn__c, i.CardColumn__r.Name, i.CardColumn__r.Dashboard__c));
+      }
+    }
   }
 
   showMyTasks(checkBoxInfo){

@@ -24,6 +24,7 @@ export default class MenuComponent extends LightningElement {
   @wire(CurrentPageReference) pageRef;
   @track actions = [];
   @api board;
+  @api logItems;
   username;
 
   connectedCallback() {
@@ -117,10 +118,7 @@ export default class MenuComponent extends LightningElement {
         this.username = result.Name;
       });
 
-
-    getAllLogItems()
-      .then(result => {
-        for (let i of result) {
+        for (let i of this.logItems) {
           if (i.Dashboard__c === this.board.id) {
             const message = i.Message__c;
             const date = i.Date__c;
@@ -128,7 +126,7 @@ export default class MenuComponent extends LightningElement {
             this.actions.unshift(actionLogItem);
           }
         }
-      });
+
   }
 
   handleChangeColumn(info) {

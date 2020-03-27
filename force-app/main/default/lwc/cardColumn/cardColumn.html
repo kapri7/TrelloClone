@@ -7,7 +7,7 @@
                                        class="slds-m-right_xx-small" title="Remove list"
                                        onclick={handleRemoveColumn}></lightning-button-icon>
                 <template for:each={cards} for:item="card">
-                    <c-card key={card} card-column={columninfo} card={card}
+                    <c-card key={card} card-column={columninfo} card={card} board={board}
                             ondeletecardclick={handleRemoveCard} onitemdrag={handleItemDrag}></c-card>
                 </template>
                 <lightning-button variant="brand" label="Add card" title="Add card" class="slds-m-left_x-small"
@@ -15,4 +15,5 @@
             </lightning-card>
         </div>
     </div>
+    <c-card-modal-box board={board} column={columninfo}></c-card-modal-box>
 </template>

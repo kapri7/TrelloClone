@@ -6,7 +6,7 @@ import { LightningElement, api } from "lwc";
 
 export default class ActionItem extends LightningElement {
   @api
-  actionitem;
+  actionItem;
 
   @api
   createdDate;

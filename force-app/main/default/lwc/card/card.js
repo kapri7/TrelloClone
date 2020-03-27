@@ -9,7 +9,7 @@ import { CurrentPageReference } from "lightning/navigation";
 export default class Card extends LightningElement {
   @api card;
   @wire(CurrentPageReference) pageRef;
-
+  @api board;
   @api cardColumn;
   connectedCallback() {
     registerListener("updatecardname", this.handleUpdateCardName, this);

@@ -9,8 +9,8 @@
         <template for:each={boards} for:item="board">
             <lightning-tab label={board.name} key={board}>
                     <lightning-layout >
-                    <c-board-layout  board={board}></c-board-layout>
-                    <c-menu board={board} onnewboard={handleNewBoard} ondeleteboard={handleDeleteBoard}></c-menu>
+                    <c-board-layout  board={board} combined-cards = {combinedCardList}></c-board-layout>
+                    <c-menu board={board} log-items ={logItems} onnewboard={handleNewBoard} ondeleteboard={handleDeleteBoard}></c-menu>
                     </lightning-layout>
             </lightning-tab>
         </template>

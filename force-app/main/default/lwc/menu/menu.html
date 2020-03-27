@@ -31,7 +31,7 @@
                 <hr>
             </div>
             <template iterator:it={actions}>
-                <c-action-item key={it.value} actionitem={it.value.message} today={it.value.date}></c-action-item>
+                <c-action-item key={it.value} action-item={it.value.message} created-date={it.value.date}></c-action-item>
             </template>
         </lightning-card>
     </div>

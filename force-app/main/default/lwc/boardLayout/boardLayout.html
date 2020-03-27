@@ -4,7 +4,7 @@
             <template for:each={cardColumns} for:item="cardColumn">
                 <lightning-layout-item size="3" class="slds-p-around_x-small" key={cardColumn}>
 
-                    <c-card-column board={board} columninfo={cardColumn} is-my-tasks={isMyTasks} ondeletecolumn={deleteCardColumn}
+                    <c-card-column board={board} columninfo={cardColumn} combined-cards = {combinedCards} is-my-tasks={isMyTasks} ondeletecolumn={deleteCardColumn}
                                    onlistitemdrag={handleListItemDrag} onitemdrop={handleItemDrop}></c-card-column>
 
                 </lightning-layout-item>
@@ -14,10 +14,8 @@
         </lightning-layout>
     </div>
 
-    <c-card-modal-box board={board}></c-card-modal-box>
     <c-column-modal-box board={board}></c-column-modal-box>
     <c-dashboard-modal-box board={board}></c-dashboard-modal-box>
-    <c-card-detail board={board}></c-card-detail>
     <c-board-detail board={board}></c-board-detail>
     <c-users-on-board board={board}></c-users-on-board>
 </template>

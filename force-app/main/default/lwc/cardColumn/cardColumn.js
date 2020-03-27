@@ -31,37 +31,40 @@ export default class CardColumn extends LightningElement {
   @api columninfo;
   @api board;
   @api isMyTasks;
+  @api combinedCards;
+
   connectedCallback() {
     registerListener("draganddrop", this.handleDragAndDrop, this);
     registerListener("addcardname", this.insertCard, this);
     registerListener("updatecardinfo", this.updateCardInfo, this);
-    this.fetchCards(this.isMyTasks);
+    registerListener("addonlymycards", this.reExtractCards, this);
+    this.fetchCards(1);
   }
 
   disconnectedCallback() {
     unregisterAllListeners(this);
   }
 
-  fetchCards(isOnlyMyTasks = 0) {
-    getAllCards()
-      .then(result => {
-        for (let i of result) {
-          if (i.CardColumn__c === this.columninfo.id) {
-            if (isOnlyMyTasks) {
-                if(Id === i.User__c){
-                  const card = new Card(i.Id, i.Name, i.CardColumn__c, i.Description__c, i.User__c);
-                  this.cards.push(card);
-                }
-
-            } else {
-              const card = new Card(i.Id, i.Name, i.CardColumn__c, i.Description__c, i.User__c);
-              this.cards.push(card);
-            }
-
+  reExtractCards(){
+    this.fetchCards(this.isMyTasks);
+  }
+  fetchCards(isMyTasks) {
+    let cardIds = [];
+    this.cards.length = 0;
+    for (let i of this.combinedCards) {
+      if (i.CardColumn__c === this.columninfo.id && !cardIds.includes(i.Id)) {
+        if (!isMyTasks) {
+          if (Id === i.User__c) {
+            cardIds.push(i.Id);
+            this.cards.push(new Card(i.Id, i.Name, i.CardColumn__c, i.Description__c, i.User__c));
           }
-
+        } else {
+          cardIds.push(i.Id);
+          this.cards.push(new Card(i.Id, i.Name, i.CardColumn__c, i.Description__c, i.User__c));
         }
-      });
+
+      }
+    }
   }
 
   insertCardItem(newCard) {

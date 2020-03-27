@@ -12,7 +12,7 @@ export default class CardModalBox extends LightningElement {
   @wire(CurrentPageReference) pageRef;
   cardColumn;
   @api board;
-
+  @api column;
   connectedCallback() {
     registerListener("showmodalcard", this.open, this);
   }
@@ -26,7 +26,7 @@ export default class CardModalBox extends LightningElement {
   }
 
   open(info) {
-    if (info.board.id === this.board.id) {
+    if (info.board.id === this.board.id && info.cardColumn.id === this.column.id) {
       this.openModal = true;
       this.cardColumn = info.cardColumn;
     }

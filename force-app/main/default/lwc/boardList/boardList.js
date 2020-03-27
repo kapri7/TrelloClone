@@ -3,10 +3,11 @@
  */
 
 import { LightningElement, track, wire } from "lwc";
-import getAllDashboards from "@salesforce/apex/DashboardController.getAllDashboards";
+import getAllLogItems from "@salesforce/apex/LogItemController.getAllLogItems";
 import deleteDashboard from "@salesforce/apex/DashboardController.deleteDashboard";
 import updateDashboard from "@salesforce/apex/DashboardController.updateDashboard";
 import getUserBoards from "@salesforce/apex/UserBoardController.getUserBoards";
+import getAllData from "@salesforce/apex/TrelloController.getAllData";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import Id from "@salesforce/user/Id";
 import { CurrentPageReference } from "lightning/navigation";
@@ -22,14 +23,52 @@ export class Dashboard {
 export default class BoardList extends LightningElement {
   @track boards = [];
   @wire(CurrentPageReference) pageRef;
-
+  @track combinedCardList;
+  logItems = [];
   connectedCallback() {
-    this.getDashboardInform();
+    this.getAll();
     registerListener("updateboardinfo", this.updateBoard, this);
   }
 
   disconnectedCallback() {
     unregisterAllListeners(this);
+  }
+
+  getAll() {
+    getAllData()
+      .then(result => {
+        this.combinedCardList = result;
+        this.extractBoards(result);
+      });
+    getAllLogItems()
+      .then(result => {
+        this.logItems = result;
+      })
+  }
+
+  extractBoards(combined) {
+    let boardIds = [];
+    let boards =[];
+    for (let i of combined) {
+      if (!boardIds.includes(i.CardColumn__r.Dashboard__c)) {
+        boardIds.push(i.CardColumn__r.Dashboard__c);
+        boards.push(new Dashboard(i.CardColumn__r.Dashboard__c, i.CardColumn__r.Dashboard__r.Name, i.CardColumn__r.Dashboard__r.Description__c));
+      }
+    }
+
+    getUserBoards()
+      .then(userBoards => {
+        for (let board of boards) {
+          for (let userboard of userBoards) {
+            if (board.id === userboard.Dashboard__c && userboard.User__c === Id) {
+              const dashboard = new Dashboard(board.id, board.name, board.description);
+              this.boards.push(dashboard);
+              break;
+            }
+          }
+        }
+      });
+
   }
 
   updateBoard(newBoard) {
@@ -52,27 +91,6 @@ export default class BoardList extends LightningElement {
         //this.getDashboardInform();
       });
 
-
-  }
-
-  getDashboardInform(){
-    getUserBoards()
-      .then(userBoards =>{
-
-        getAllDashboards()
-          .then(boards =>{
-            for (let board of boards) {
-              for(let userboard of userBoards){
-                if(board.Id === userboard.Dashboard__c && userboard.User__c === Id) {
-                  const dashboard = new Dashboard(board.Id, board.Name, board.Description__c);
-                  this.boards.push(dashboard);
-                  break;
-                }
-              }
-            }
-          })
-
-      })
 
   }
 

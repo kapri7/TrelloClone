@@ -7,7 +7,7 @@ import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
 
 export default class CardDetail extends LightningElement {
-  @track card;
+  @api card;
   @track openModal;
   @wire(CurrentPageReference) pageRef;
   previousColumn;
@@ -26,7 +26,7 @@ export default class CardDetail extends LightningElement {
   }
 
   handleCardInfoClick(cardInfo) {
-    if (cardInfo.cardColumn.board === this.board.id) {
+    if (cardInfo.cardColumn.board === this.board.id && cardInfo.card.id === this.card.id) {
       this.openModal = true;
       this.card = cardInfo.card;
       this.previousColumn = cardInfo.cardColumn;
