@@ -20,6 +20,18 @@
                             <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Card Info</h2>
                         </header>
                         <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <lightning-card title="Description">
+                                <lightning-button-menu alternative-text="Show add file" slot='actions' variant="border-filled"
+                                                       tooltip="Add files" menu-alignment="right" icon-name="action:share_file"
+                                                       class="slds-m-left_large">
+                                    <lightning-menu-item value="Google Drive" label="Google Drive"
+                                                         onclick = {handleSearchGoogleFile}></lightning-menu-item>
+                                    <lightning-menu-item value="OneDrive" label="OneDrive"
+                                                         ></lightning-menu-item>
+                                    <lightning-menu-item value="Dropbox" label="Dropbox"
+                                    ></lightning-menu-item>
+
+                                </lightning-button-menu>
                             <div class="slds-m-around_medium">
                                 <lightning-input-field field-name='Name' value={card.name} onchange={handleNameChange}></lightning-input-field>
                                 <lightning-input-field field-name='CardColumn__c'
@@ -28,7 +40,16 @@
                                                        value={card.description} onchange={handleDescriptionChange}></lightning-input-field>
                                 <lightning-input-field field-name='User__c' value={card.user} onchange={handleUserChange}></lightning-input-field>
                             </div>
+                            </lightning-card>
+                            <template if:true={isFiles}>
+                            <lightning-card title="Attached files">
+                               <template for:each={googleFiles} for:item="googleFile">
+                                    <c-google-file-card key={googleFile} google-file = {googleFile} ondeletefilefromboard={deleteFileFromBoard}></c-google-file-card>
+                                </template>
+                            </lightning-card>
+                            </template>
                         </div>
+
                         <footer class="slds-modal__footer">
                             <lightning-button label="Cancel" variant="neutral" onclick={closeModal}></lightning-button>&nbsp;&nbsp;&nbsp;&nbsp;
                             <lightning-button label="Save" variant="brand" onclick={saveMethod}></lightning-button>

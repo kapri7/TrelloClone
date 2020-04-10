@@ -49,7 +49,7 @@ export default class CardColumn extends LightningElement {
     this.fetchCards(this.isMyTasks);
   }
   fetchCards(isMyTasks) {
-    let cardIds = [];
+    let cardIds = [];//
     this.cards.length = 0;
     for (let i of this.combinedCards) {
       if (i.CardColumn__c === this.columninfo.id && !cardIds.includes(i.Id)) {
@@ -152,7 +152,6 @@ export default class CardColumn extends LightningElement {
       Id: updatedCard.newCard.id,
       User__c: updatedCard.newCard.user
     };
-
     this.updateCardItem(newCard, updatedCard.oldColumn);
   }
 

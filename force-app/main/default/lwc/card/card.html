@@ -5,9 +5,10 @@
             <div class ="slds-box">{card.name}</div>
         </lightning-layout-item>
         <lightning-layout-item>
-        <lightning-button class = "slds-m-left_x-small" variant="destructive" label="" title="Delete card" icon-name="utility:delete"  onclick={deleteCard}></lightning-button>
+            <lightning-button-icon icon-name="utility:delete"    alternative-text="Delete"   class="slds-m-left_xx-small" title="Delete" onclick={deleteCard}></lightning-button-icon>
         </lightning-layout-item>
     </lightning-layout>
     </div>
     <c-card-detail board={board} card={card}></c-card-detail>
+    <c-new-google-file card-id={card.id}></c-new-google-file>
 </template>
