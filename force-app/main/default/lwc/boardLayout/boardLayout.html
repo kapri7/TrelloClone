@@ -4,7 +4,7 @@
             <template for:each={cardColumns} for:item="cardColumn">
                 <lightning-layout-item size="3" class="slds-p-around_x-small" key={cardColumn}>
 
-                    <c-card-column board={board} columninfo={cardColumn} combined-cards = {combinedCards} is-my-tasks={isMyTasks} ondeletecolumn={deleteCardColumn}
+                    <c-card-column google-file-cards ={googleFileCards} board={board} columninfo={cardColumn} combined-cards = {combinedCards} is-my-tasks={isMyTasks} ondeletecolumn={deleteCardColumn}
                                    onlistitemdrag={handleListItemDrag} onitemdrop={handleItemDrop}></c-card-column>
 
                 </lightning-layout-item>

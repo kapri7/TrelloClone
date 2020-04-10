@@ -11,9 +11,9 @@ export default class Card extends LightningElement {
   @wire(CurrentPageReference) pageRef;
   @api board;
   @api cardColumn;
+  @api googleFileCards;
   connectedCallback() {
     registerListener("updatecardname", this.handleUpdateCardName, this);
-
   }
   handleUpdateCardName(card){
     if(this.card.id === card.id)

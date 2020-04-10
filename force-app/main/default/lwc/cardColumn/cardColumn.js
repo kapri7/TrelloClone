@@ -27,12 +27,12 @@ export default class CardColumn extends LightningElement {
 
   @wire(CurrentPageReference) pageRef;
 
+  @api googleFileCards;
   @track cards = [];
   @api columninfo;
   @api board;
   @api isMyTasks;
   @api combinedCards;
-
   connectedCallback() {
     registerListener("draganddrop", this.handleDragAndDrop, this);
     registerListener("addcardname", this.insertCard, this);

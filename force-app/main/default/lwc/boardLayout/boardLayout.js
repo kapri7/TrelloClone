@@ -28,11 +28,14 @@ export default class BoardLayout extends LightningElement {
   @wire(CurrentPageReference) pageRef;
   @api board;
   @api combinedCards;
+  @api googleFileCards;
+
   @track isMyTasks = 0;
   connectedCallback() {
     registerListener("addcolumnname", this.insertColumn, this);
     registerListener("checkboxtasks", this.showMyTasks, this);
     this.fetchData();
+    //console.log(this.googleFiles);
   }
 
   disconnectedCallback() {

@@ -8,6 +8,8 @@ import deleteDashboard from "@salesforce/apex/DashboardController.deleteDashboar
 import updateDashboard from "@salesforce/apex/DashboardController.updateDashboard";
 import getUserBoards from "@salesforce/apex/UserBoardController.getUserBoards";
 import getAllData from "@salesforce/apex/TrelloController.getAllData";
+import getGoogleFileCards from "@salesforce/apex/GoogleFileCardController.getGoogleFileCards";
+import getGoogleFiles from "@salesforce/apex/GoogleDriveController.getGoogleFiles";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import Id from "@salesforce/user/Id";
 import { CurrentPageReference } from "lightning/navigation";
@@ -24,6 +26,8 @@ export default class BoardList extends LightningElement {
   @track boards = [];
   @wire(CurrentPageReference) pageRef;
   @track combinedCardList;
+  @track googleFileCards;
+  @track googleFiles;
   logItems = [];
   connectedCallback() {
     this.getAll();
@@ -35,6 +39,14 @@ export default class BoardList extends LightningElement {
   }
 
   getAll() {
+    getGoogleFileCards()
+      .then(result => {
+        this.googleFileCards = result;
+      })
+    getGoogleFiles()
+      .then(result => {
+        this.googleFiles = result;
+      })
     getAllData()
       .then(result => {
         this.combinedCardList = result;

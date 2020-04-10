@@ -5,7 +5,6 @@
 import { LightningElement, api, track, wire } from "lwc";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
-import getGoogleFileCards from "@salesforce/apex/GoogleFileCardController.getGoogleFileCards"
 import deleteGoogleFileCard from "@salesforce/apex/GoogleFileCardController.deleteGoogleFileCard"
 
 class GoogleFileCard {
@@ -27,6 +26,7 @@ export default class CardDetail extends LightningElement {
   previousColumn;
   @api board;
 
+  @api googleFileCards;
   @track googleFiles = [];
   @track oneDriveFiles = [];
   @track dropboxFiles = [];
@@ -34,7 +34,7 @@ export default class CardDetail extends LightningElement {
   connectedCallback() {
     registerListener("cardinfoclick", this.handleCardInfoClick, this);
     registerListener("newfileadded", this.handleAddNewFile, this);
-    this.getGoogleFiles();
+    this.getGoogleCardFiles();
   }
 
   disconnectedCallback() {
@@ -42,17 +42,14 @@ export default class CardDetail extends LightningElement {
   }
 
 
-  getGoogleFiles(){
-    getGoogleFileCards()
-      .then(googleFileCards => {
-        for(let file of googleFileCards){
+  getGoogleCardFiles(){
+        for(let file of this.googleFileCards){
 
           if(file.Card__c === this.card.id) {
             this.isFiles = true;
             this.googleFiles.push(new GoogleFileCard(file.items_Google_Drive__c, file.FileName__c, file.FileUrl__c,file.Card__c));
           }
         }
-      })
   }
 
   deleteFileFromBoard(event){
@@ -70,11 +67,16 @@ export default class CardDetail extends LightningElement {
         }
       })
   }
+
   handleSearchGoogleFile(){
     fireEvent(this.pageRef,"showmodalgooglefile",this.card.id)
   }
+
   handleAddNewFile(cardFile){
-    this.googleFiles.push(new GoogleFileCard(cardFile.file.id, cardFile.file.name, cardFile.file.url,cardFile.cardId));
+    if(cardFile.cardId === this.card.id) {
+      this.isFiles = true;
+      this.googleFiles.push(new GoogleFileCard(cardFile.file.id, cardFile.file.name, cardFile.file.url, cardFile.cardId));
+    }
   }
 
   handleCardInfoClick(cardInfo) {

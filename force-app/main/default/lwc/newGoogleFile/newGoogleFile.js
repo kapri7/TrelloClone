@@ -4,7 +4,6 @@
 
 import { LightningElement, track, wire, api } from "lwc";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
-import getGoogleFiles from "@salesforce/apex/GoogleDriveController.getGoogleFiles";
 import addGoogleFileCard from "@salesforce/apex/GoogleFileCardController.addGoogleFileCard";
 import { CurrentPageReference } from "lightning/navigation";
 
@@ -19,7 +18,8 @@ class File {
 export default class NewGoogleFile extends LightningElement {
   @track openModal;
   @track files = [];
-  @api cardId;
+  @api googleFiles;
+  cardId;
   @wire(CurrentPageReference) pageRef;
 
   connectedCallback() {
@@ -32,15 +32,12 @@ export default class NewGoogleFile extends LightningElement {
   }
 
   getFiles() {
-    getGoogleFiles()
-      .then(result => {
-        for (let file of result) {
+        for (let file of this.googleFiles) {
+          console.log("1");
           if (!file.IsFolder__c) {
             this.files.push(new File(file.Id, file.Name__c, file.DownloadUrl__c));
-            //  console.log(file.Name__c);
           }
         }
-      });
   }
 
   handleSelectFile(event) {
@@ -56,11 +53,10 @@ export default class NewGoogleFile extends LightningElement {
   }
 
   open(cardId) {
-    if (this.cardId === cardId) {
+    this.cardId = cardId;
       this.openModal = true;
+      console.log(this.googleFiles);
       this.getFiles();
-    }
-
   }
 
   closeModal() {

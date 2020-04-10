@@ -9,12 +9,12 @@
         <template for:each={boards} for:item="board">
             <lightning-tab label={board.name} key={board}>
                     <lightning-layout >
-                    <c-board-layout  board={board} combined-cards = {combinedCardList}></c-board-layout>
+                    <c-board-layout  google-file-cards ={googleFileCards} board={board} combined-cards = {combinedCardList} google-files = {googleFiles}></c-board-layout>
                     <c-menu board={board} log-items ={logItems} onnewboard={handleNewBoard} ondeleteboard={handleDeleteBoard}></c-menu>
                     </lightning-layout>
             </lightning-tab>
         </template>
 
     </lightning-tabset>
-
+    <c-new-google-file google-files = {googleFiles}></c-new-google-file>
 </template>
