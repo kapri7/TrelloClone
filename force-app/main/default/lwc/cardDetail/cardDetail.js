@@ -47,7 +47,7 @@ export default class CardDetail extends LightningElement {
 
           if(file.Card__c === this.card.id) {
             this.isFiles = true;
-            this.googleFiles.push(new GoogleFileCard(file.items_Google_Drive__c, file.FileName__c, file.FileUrl__c,file.Card__c));
+            this.googleFiles.push(new GoogleFileCard(file.FileId__c, file.FileName__c, file.FileUrl__c,file.Card__c));
           }
         }
   }
@@ -59,7 +59,7 @@ export default class CardDetail extends LightningElement {
       }
     });
 
-    deleteGoogleFileCard({ googleFileId: event.detail.file.id, cardId: event.detail.cardId })
+    deleteGoogleFileCard({ fileId: event.detail.file.id, cardId: event.detail.cardId })
       .then(result =>{
         this.googleFiles.splice(ind, 1);
         if(this.googleFiles.length === 0){
@@ -69,7 +69,27 @@ export default class CardDetail extends LightningElement {
   }
 
   handleSearchGoogleFile(){
-    fireEvent(this.pageRef,"showmodalgooglefile",this.card.id)
+    const filesInfo = {
+      fileListType: "Google",
+      cardId: this.card.id
+    }
+    fireEvent(this.pageRef,"showmodalgooglefile",filesInfo)
+  }
+
+  handleSearchOneDriveFile(){
+    const filesInfo = {
+      fileListType: "OneDrive",
+      cardId: this.card.id
+    }
+    fireEvent(this.pageRef,"showmodalgooglefile",filesInfo)
+  }
+
+  handleSearchDropboxFile(){
+    const filesInfo = {
+      fileListType: "Dropbox",
+      cardId: this.card.id
+    }
+    fireEvent(this.pageRef,"showmodalgooglefile",filesInfo)
   }
 
   handleAddNewFile(cardFile){

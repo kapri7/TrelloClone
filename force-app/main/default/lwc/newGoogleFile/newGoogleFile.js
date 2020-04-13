@@ -19,7 +19,10 @@ export default class NewGoogleFile extends LightningElement {
   @track openModal;
   @track files = [];
   @api googleFiles;
+  @api filesOneDrive;
+  @api dropboxFiles;
   cardId;
+  fileSource;
   @wire(CurrentPageReference) pageRef;
 
   connectedCallback() {
@@ -31,35 +34,44 @@ export default class NewGoogleFile extends LightningElement {
     unregisterAllListeners(this);
   }
 
-  getFiles() {
-        for (let file of this.googleFiles) {
-          console.log("1");
-          if (!file.IsFolder__c) {
-            this.files.push(new File(file.Id, file.Name__c, file.DownloadUrl__c));
-          }
-        }
+  getFiles(fileType) {
+    let files;
+    this.fileSource = fileType;
+    if (fileType === "Google") {
+      files = this.googleFiles;
+    } else if (fileType === "OneDrive") {
+      files = this.filesOneDrive;
+    } else if (fileType === "Dropbox") {
+      files = this.dropboxFiles;
+    }
+    for (let file of files) {
+
+      if (!file.IsFolder__c) {
+        this.files.push(new File(file.Id, file.Name__c, file.DownloadUrl__c));
+      }
+    }
   }
 
   handleSelectFile(event) {
-    addGoogleFileCard({googleFileId:event.detail.id,cardId:this.cardId})
-      .then(result =>{
+    addGoogleFileCard({ fileId: event.detail.id, cardId: this.cardId, fileSource: this.fileSource })
+      .then(result => {
         this.closeModal();
         const newFileCard = {
           file: event.detail,
-          cardId:this.cardId
-        }
-        fireEvent(this.pageRef,"newfileadded",newFileCard);
-      })
+          cardId: this.cardId
+        };
+        fireEvent(this.pageRef, "newfileadded", newFileCard);
+      });
   }
 
-  open(cardId) {
-    this.cardId = cardId;
-      this.openModal = true;
-      console.log(this.googleFiles);
-      this.getFiles();
+  open(filesInfo) {
+    this.cardId = filesInfo.cardId;
+    this.openModal = true;
+    this.getFiles(filesInfo.fileListType);
   }
 
   closeModal() {
+    this.files.length = 0;
     this.openModal = false;
   }
 }
