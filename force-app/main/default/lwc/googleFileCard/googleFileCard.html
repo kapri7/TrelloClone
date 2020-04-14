@@ -5,12 +5,11 @@
 <!-- Google File Card -->
 <template>
     <lightning-layout>
-        <lightning-layout-item >
-           <div class="slds-box"> <a href={googleFile.file.url}>{googleFile.file.name}</a></div>
+        <lightning-layout-item>
+            <div class="slds-box"><a href={googleFile.file.url}>{googleFile.file.name}</a></div>
         </lightning-layout-item>
 
         <lightning-button-icon icon-name="utility:close" variant="container" alternative-text="Remove"
-
                                class="slds-m-right_xx-small" title="Remove"
                                onclick={handleRemoveFile}></lightning-button-icon>
     </lightning-layout>

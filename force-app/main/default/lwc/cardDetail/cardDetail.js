@@ -5,10 +5,10 @@
 import { LightningElement, api, track, wire } from "lwc";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
-import deleteGoogleFileCard from "@salesforce/apex/GoogleFileCardController.deleteGoogleFileCard"
+import deleteGoogleFileCard from "@salesforce/apex/GoogleFileCardController.deleteGoogleFileCard";
 
 class GoogleFileCard {
-  constructor(fileId, name, url,cardId) {
+  constructor(fileId, name, url, cardId) {
     this.file = {
       id: fileId,
       name: name,
@@ -31,9 +31,10 @@ export default class CardDetail extends LightningElement {
   @track oneDriveFiles = [];
   @track dropboxFiles = [];
 
+
   connectedCallback() {
     registerListener("cardinfoclick", this.handleCardInfoClick, this);
-    registerListener("newfileadded", this.handleAddNewFile, this);
+    registerListener("newfilesadded", this.handleAddNewFiles, this);
     this.getGoogleCardFiles();
   }
 
@@ -41,18 +42,17 @@ export default class CardDetail extends LightningElement {
     unregisterAllListeners(this);
   }
 
+  getGoogleCardFiles() {
+    for (let file of this.googleFileCards) {
 
-  getGoogleCardFiles(){
-        for(let file of this.googleFileCards){
-
-          if(file.Card__c === this.card.id) {
-            this.isFiles = true;
-            this.googleFiles.push(new GoogleFileCard(file.FileId__c, file.FileName__c, file.FileUrl__c,file.Card__c));
-          }
-        }
+      if (file.Card__c === this.card.id) {
+        this.isFiles = true;
+        this.googleFiles.push(new GoogleFileCard(file.FileId__c, file.FileName__c, file.FileUrl__c, file.Card__c));
+      }
+    }
   }
 
-  deleteFileFromBoard(event){
+  deleteFileFromBoard(event) {
     const ind = this.googleFiles.findIndex((element, index, array) => {
       if (element.file.id === event.detail.file.id) {
         return true;
@@ -60,42 +60,46 @@ export default class CardDetail extends LightningElement {
     });
 
     deleteGoogleFileCard({ fileId: event.detail.file.id, cardId: event.detail.cardId })
-      .then(result =>{
+      .then(result => {
         this.googleFiles.splice(ind, 1);
-        if(this.googleFiles.length === 0){
+        if (this.googleFiles.length === 0) {
           this.isFiles = false;
         }
-      })
+      });
   }
 
-  handleSearchGoogleFile(){
+  handleSearchGoogleFile() {
     const filesInfo = {
       fileListType: "Google",
       cardId: this.card.id
-    }
-    fireEvent(this.pageRef,"showmodalgooglefile",filesInfo)
+    };
+    fireEvent(this.pageRef, "showmodalgooglefile", filesInfo);
   }
 
-  handleSearchOneDriveFile(){
+  handleSearchOneDriveFile() {
     const filesInfo = {
       fileListType: "OneDrive",
       cardId: this.card.id
-    }
-    fireEvent(this.pageRef,"showmodalgooglefile",filesInfo)
+    };
+    fireEvent(this.pageRef, "showmodalgooglefile", filesInfo);
   }
 
-  handleSearchDropboxFile(){
+  handleSearchDropboxFile() {
     const filesInfo = {
       fileListType: "Dropbox",
       cardId: this.card.id
-    }
-    fireEvent(this.pageRef,"showmodalgooglefile",filesInfo)
+    };
+    fireEvent(this.pageRef, "showmodalgooglefile", filesInfo);
   }
 
-  handleAddNewFile(cardFile){
-    if(cardFile.cardId === this.card.id) {
-      this.isFiles = true;
-      this.googleFiles.push(new GoogleFileCard(cardFile.file.id, cardFile.file.name, cardFile.file.url, cardFile.cardId));
+  handleAddNewFiles(cardFiles) {
+
+    if (cardFiles.cardId === this.card.id) {
+      for (let cardFile of cardFiles.newFiles) {
+        console.log(cardFile);
+        this.isFiles = true;
+        this.googleFiles.push(new GoogleFileCard(cardFile.id, cardFile.name, cardFile.url, cardFiles.cardId));
+      }
     }
   }
 
