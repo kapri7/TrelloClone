@@ -5,18 +5,21 @@
 public with sharing class GoogleFileCardController {
     @AuraEnabled
     public static void addGoogleFileCard(List<Id> fileIds, Id cardId, String fileSource) {
-        System.debug(fileIds);
+        List<items_Google_Drive__x> itemsGoogleDrive = [SELECT Name__c,DownloadUrl__c FROM items_Google_Drive__x WHERE Id IN :fileIds];
         List<GoogleFileCard__c> fileCards = new List<GoogleFileCard__c>();
+
         for (Id fileId : fileIds) {
-            System.debug(fileId);
             GoogleFileCard__c fileCard = new GoogleFileCard__c();
             fileCard.Card__c = cardId;
             fileCard.FileId__c = fileId;
             if (fileSource == 'Google') {
-                items_Google_Drive__x itemsGoogleDrive = [SELECT Name__c,DownloadUrl__c FROM items_Google_Drive__x WHERE Id = :fileId][0];
-                fileCard.FileName__c = itemsGoogleDrive.Name__c;
-                fileCard.FileUrl__c = itemsGoogleDrive.DownloadUrl__c;
-                fileCard.Name = 'Google';
+                for (items_Google_Drive__x item : itemsGoogleDrive) {
+                    if (item.Id == fileId) {
+                        fileCard.FileName__c = item.Name__c;
+                        fileCard.FileUrl__c = item.DownloadUrl__c;
+                        fileCard.Name = 'Google';
+                    }
+                }
             } else if (fileSource == 'OneDrive') {
             } else if (fileSource == 'Dropbox') {
 

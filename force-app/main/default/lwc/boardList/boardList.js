@@ -39,23 +39,19 @@ export default class BoardList extends LightningElement {
   }
 
   getAll() {
-    getGoogleFileCards()
-      .then(result => {
-        this.googleFileCards = result;
-      })
-    getGoogleFiles()
-      .then(result => {
-        this.googleFiles = result;
-      })
     getAllData()
       .then(result => {
-        this.combinedCardList = result;
-        this.extractBoards(result);
+        console.log(result);
+        this.googleFileCards = result['GoogleFileCard'];
+        console.log(this.googleFileCards);
+        this.googleFiles = result['ItemsGoogleDrive'];
+        console.log(this.googleFiles);
+        this.logItems = result['LogItem'];
+        console.log(this.logItems);
+        this.combinedCardList = result['CardColumnDashboard'];
+        console.log(this.combinedCardList);
+        this.extractBoards(this.combinedCardList);
       });
-    getAllLogItems()
-      .then(result => {
-        this.logItems = result;
-      })
   }
 
   extractBoards(combined) {

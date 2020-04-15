@@ -4,6 +4,7 @@
 
 <!-- Card Detail -->
 <template>
+    <div class="slds-scrollable_y">
     <template if:true={openModal}>
         <div class="demo-only">
             <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
@@ -42,8 +43,8 @@
                             </div>
                             </lightning-card>
                             <template if:true={isFiles}>
-                            <lightning-card title="Attached files">
-                               <template for:each={googleFiles} for:item="googleFile">
+                            <lightning-card  title="Attached files">
+                               <template class ="slds-modal__content slds-p-around_medium" for:each={googleFiles} for:item="googleFile">
                                     <c-google-file-card key={googleFile} google-file = {googleFile} ondeletefilefromboard={deleteFileFromBoard}></c-google-file-card>
                                 </template>
 
@@ -61,4 +62,5 @@
             <div class="slds-backdrop slds-backdrop_open"></div>
         </div>
     </template>
+    </div>
 </template>
