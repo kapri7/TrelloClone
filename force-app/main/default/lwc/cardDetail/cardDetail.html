@@ -25,13 +25,14 @@
                                 <lightning-button-menu alternative-text="Show add file" slot='actions' variant="border-filled"
                                                        tooltip="Add files" menu-alignment="right" icon-name="action:share_file"
                                                        class="slds-m-left_large">
+                                    <lightning-menu-item value="Storage" label="Storage"
+                                                         onclick = {handleSearchStorageFile}></lightning-menu-item>
                                     <lightning-menu-item value="Google Drive" label="Google Drive"
                                                          onclick = {handleSearchGoogleFile}></lightning-menu-item>
                                     <lightning-menu-item value="OneDrive" label="OneDrive"
                                                          onclick = {handleSearchOneDriveFile}></lightning-menu-item>
                                     <lightning-menu-item value="Dropbox" label="Dropbox"
                                                          onclick = {handleSearchDropboxFile}></lightning-menu-item>
-
                                 </lightning-button-menu>
                             <div class="slds-m-around_medium">
                                 <lightning-input-field field-name='Name' value={card.name} onchange={handleNameChange}></lightning-input-field>

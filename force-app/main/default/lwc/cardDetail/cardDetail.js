@@ -68,7 +68,13 @@ export default class CardDetail extends LightningElement {
       });
   }
 
+  handleSearchStorageFile(){
+    this.closeModal()
+    fireEvent(this.pageRef, "showmodalstoragefile", this.card.id);
+  }
+
   handleSearchGoogleFile() {
+    this.closeModal()
     const filesInfo = {
       fileListType: "Google",
       cardId: this.card.id
@@ -77,6 +83,7 @@ export default class CardDetail extends LightningElement {
   }
 
   handleSearchOneDriveFile() {
+    this.closeModal()
     const filesInfo = {
       fileListType: "OneDrive",
       cardId: this.card.id
@@ -85,6 +92,7 @@ export default class CardDetail extends LightningElement {
   }
 
   handleSearchDropboxFile() {
+    this.closeModal()
     const filesInfo = {
       fileListType: "Dropbox",
       cardId: this.card.id
@@ -95,6 +103,7 @@ export default class CardDetail extends LightningElement {
   handleAddNewFiles(cardFiles) {
 
     if (cardFiles.cardId === this.card.id) {
+      this.openModal = true;
       for (let cardFile of cardFiles.newFiles) {
         console.log(cardFile);
         this.isFiles = true;

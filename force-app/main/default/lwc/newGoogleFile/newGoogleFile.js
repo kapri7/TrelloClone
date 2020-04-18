@@ -72,7 +72,7 @@ export default class NewGoogleFile extends LightningElement {
   }
 
   handleSelectedFiles() {
-    addGoogleFileCard({ fileIds: this.value, cardId: this.cardId, fileSource: this.fileSource })
+    addGoogleFileCard({ fileIds: this.value, cardId: this.cardId, fileSource: this.fileSource})
       .then(result => {
         let newFiles = [];
         for (let fileId of this.value) {
