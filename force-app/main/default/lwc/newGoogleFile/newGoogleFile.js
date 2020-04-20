@@ -5,6 +5,7 @@
 import { LightningElement, track, wire, api } from "lwc";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import addGoogleFileCard from "@salesforce/apex/GoogleFileCardController.addGoogleFileCard";
+import getFilesList from "@salesforce/apex/DropboxController.getFilesList";
 import { CurrentPageReference } from "lightning/navigation";
 
 class File {
@@ -19,8 +20,6 @@ export default class NewGoogleFile extends LightningElement {
   @track openModal;
   @track files = [];
   @api googleFiles;
-  @api filesOneDrive;
-  @api dropboxFiles;
   cardId;
   fileSource;
   @wire(CurrentPageReference) pageRef;
@@ -54,25 +53,42 @@ export default class NewGoogleFile extends LightningElement {
   }
 
   getFiles(fileType) {
-    let files;//local variable
     this.fileSource = fileType;
     if (fileType === "Google") {
-      files = this.googleFiles;
-    } else if (fileType === "OneDrive") {
-      files = this.filesOneDrive;
-    } else if (fileType === "Dropbox") {
-      files = this.dropboxFiles;
-    }
-    for (let file of files) {
+      for (let file of this.googleFiles) {
 
-      if (!file.IsFolder__c) {
-        this.files.push(new File(file.Id, file.Name__c, file.DownloadUrl__c));
+        if (!file.IsFolder__c) {
+          this.files.push(new File(file.Id, file.Name__c, file.DownloadUrl__c));
+        }
       }
+    } else if (fileType === "Dropbox") {
+      getFilesList()
+        .then(result => {
+          console.log(result);
+          for (let dropboxFile of result) {
+            this.files.push(new File(dropboxFile.fileId__c, dropboxFile.Name, dropboxFile.fileUrl__c));
+          }
+        })
+      .catch(error => {
+        console.log(error);
+      })
+
     }
   }
 
   handleSelectedFiles() {
-    addGoogleFileCard({ fileIds: this.value, cardId: this.cardId, fileSource: this.fileSource})
+    let selectedFiles = [];
+
+      for(let file of this.files){
+        for(let id of this.value ){
+          if(file.id === id){
+            selectedFiles.push(file);
+          }
+
+        }
+      }
+
+    addGoogleFileCard({ files: JSON.stringify(selectedFiles), cardId: this.cardId, fileSource: this.fileSource})
       .then(result => {
         let newFiles = [];
         for (let fileId of this.value) {
@@ -81,7 +97,6 @@ export default class NewGoogleFile extends LightningElement {
               return true;
             }
           });
-          console.log(this.files[0]);
           newFiles.push(this.files[ind]);
         }
         const newFileCards = {

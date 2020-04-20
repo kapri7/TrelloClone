@@ -28,8 +28,6 @@ export default class CardDetail extends LightningElement {
 
   @api googleFileCards;
   @track googleFiles = [];
-  @track oneDriveFiles = [];
-  @track dropboxFiles = [];
 
 
   connectedCallback() {
@@ -82,14 +80,6 @@ export default class CardDetail extends LightningElement {
     fireEvent(this.pageRef, "showmodalgooglefile", filesInfo);
   }
 
-  handleSearchOneDriveFile() {
-    this.closeModal()
-    const filesInfo = {
-      fileListType: "OneDrive",
-      cardId: this.card.id
-    };
-    fireEvent(this.pageRef, "showmodalgooglefile", filesInfo);
-  }
 
   handleSearchDropboxFile() {
     this.closeModal()

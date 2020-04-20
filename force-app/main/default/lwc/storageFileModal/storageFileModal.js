@@ -2,7 +2,7 @@
  * Created by IvanSteniakin on 4/17/2020.
  */
 
-import { LightningElement,api,track, wire} from "lwc";
+import { LightningElement, api, track, wire } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import addGoogleFileCard from "@salesforce/apex/GoogleFileCardController.addGoogleFileCard";
@@ -28,24 +28,25 @@ export default class StorageFileModal extends LightningElement {
   disconnectedCallback() {
     unregisterAllListeners(this);
   }
+
   get acceptedFormats() {
-    return ['.pdf', '.png','.doc','.docx'];
+    return [".pdf", ".png", ".doc", ".docx"];
   }
 
   handleUploadFinished(event) {
     const uploadedFiles = event.detail.files;
     console.log(uploadedFiles);
 
-    let fileIds = [];
-    for(let fileId of uploadedFiles){
-      fileIds.push(fileId.documentId);
+    let files = [];
+    for (let file of uploadedFiles) {
+      files.push(new File(file.documentId, file.name, "/sfc/servlet.shepherd/document/download/" + file.documentId));
     }
-
-    addGoogleFileCard({fileIds:fileIds,cardId:this.myRecordId,fileSource:"Storage"})
+    console.log(files);
+    addGoogleFileCard({ files: JSON.stringify(files), cardId: this.myRecordId, fileSource: "Storage" })
       .then(result => {
         let newFiles = [];
-        for(let fileId of uploadedFiles){
-          newFiles.push(new File(fileId.documentId,fileId.name,'/sfc/servlet.shepherd/document/download/'+fileId.documentId))
+        for (let fileId of uploadedFiles) {
+          newFiles.push(new File(fileId.documentId, fileId.name, "/sfc/servlet.shepherd/document/download/" + fileId.documentId));
         }
         const newFileCards = {
           newFiles: newFiles,
@@ -56,13 +57,14 @@ export default class StorageFileModal extends LightningElement {
       })
       .catch(error => {
         console.log(error);
-      })
+      });
   }
 
-  open(cardId){
+  open(cardId) {
     this.openModal = true;
     this.myRecordId = cardId;
   }
+
   closeModal() {
     this.openModal = false;
   }
