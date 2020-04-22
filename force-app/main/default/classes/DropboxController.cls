@@ -3,10 +3,24 @@
  */
 public with sharing class DropboxController {
 
-    static public List<DropboxFile__c> dropboxFiles = new List<DropboxFile__c>();
+    static public List<DropboxFile> dropboxFiles = new List<DropboxFile>();
 
+
+    public class DropboxFile{
+        @AuraEnabled
+        public String id;
+        @AuraEnabled
+        public String url;
+        @AuraEnabled
+        public String name;
+        DropboxFile(String id,String url, String name){
+            this.id = id;
+            this.url = url;
+            this.name = name;
+        }
+    }
     @AuraEnabled
-    public static List<DropboxFile__c> getFilesList() {//todo should get the token as argument
+    public static List<DropboxFile> getFilesList() {//todo should get the token as argument
         String subPath = '';
         String url = 'https://api.dropboxapi.com/2/files/list_folder';
         HttpRequest request = new HttpRequest();
@@ -42,7 +56,7 @@ public with sharing class DropboxController {
                 HttpResponse fileUrl = httpUrl.send(requestUrl);
 
                 if (JSON2Url.parse(fileUrl.getBody()).links.size() != 0) {
-                    dropboxFiles.add(new DropboxFile__c(fileId__c = entry.id, Name = entry.name, fileUrl__c = JSON2Url.parse(fileUrl.getBody()).links[0].url));
+                    dropboxFiles.add(new DropboxFile(entry.id, entry.name, JSON2Url.parse(fileUrl.getBody()).links[0].url));
                 } else {
                     String urlToCreate = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
                     HttpRequest requestNewUrl = new HttpRequest();
@@ -54,7 +68,7 @@ public with sharing class DropboxController {
 
                     Http httpNewUrl = new Http();
                     HttpResponse fileNewUrl = httpNewUrl.send(requestNewUrl);
-                    dropboxFiles.add(new DropboxFile__c(fileId__c = entry.id, Name = entry.name, fileUrl__c = JSON2NewUrl.parse(fileNewUrl.getBody()).url));
+                    dropboxFiles.add(new DropboxFile(entry.id, entry.name, JSON2NewUrl.parse(fileNewUrl.getBody()).url));
                 }
             }
         }
