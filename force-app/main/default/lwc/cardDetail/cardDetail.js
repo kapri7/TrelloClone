@@ -5,7 +5,7 @@
 import { LightningElement, api, track, wire } from "lwc";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
-import deleteGoogleFileCard from "@salesforce/apex/GoogleFileCardController.deleteGoogleFileCard";
+import deleteFileCard from "@salesforce/apex/FileCardController.deleteFileCard";
 
 class GoogleFileCard {
   constructor(fileId, name, url, cardId) {
@@ -57,7 +57,7 @@ export default class CardDetail extends LightningElement {
       }
     });
 
-    deleteGoogleFileCard({ fileId: event.detail.file.id, cardId: event.detail.cardId })
+    deleteFileCard({ fileId: event.detail.file.id, cardId: event.detail.cardId })
       .then(result => {
         this.googleFiles.splice(ind, 1);
         if (this.googleFiles.length === 0) {

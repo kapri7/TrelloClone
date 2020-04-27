@@ -5,7 +5,6 @@
 import { LightningElement, track, api, wire } from "lwc";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
-import getAllCards from "@salesforce/apex/CardController.getAllCards";
 import insertNewCard from "@salesforce/apex/CardController.insertNewCard";
 import deleteCard from "@salesforce/apex/CardController.deleteCard";
 import updateCard from "@salesforce/apex/CardController.updateCard";

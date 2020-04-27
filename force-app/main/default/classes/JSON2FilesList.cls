@@ -101,13 +101,6 @@ public class JSON2FilesList {
         } while (depth > 0 && parser.nextToken() != null);
     }
 
-
-
-
-
-
-
-
     private static List<Entries> arrayOfEntries(System.JSONParser p) {
         List<Entries> res = new List<Entries>();
         if (p.getCurrentToken() == null) p.nextToken();
@@ -116,6 +109,4 @@ public class JSON2FilesList {
         }
         return res;
     }
-
-
 }

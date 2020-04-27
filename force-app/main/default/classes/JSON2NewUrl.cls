@@ -203,12 +203,6 @@ public class JSON2NewUrl {
         } while (depth > 0 && parser.nextToken() != null);
     }
 
-
-
-
-
-
-
     private static List<Visibility_policies> arrayOfVisibility_policies(System.JSONParser p) {
         List<Visibility_policies> res = new List<Visibility_policies>();
         if (p.getCurrentToken() == null) p.nextToken();
@@ -218,12 +212,6 @@ public class JSON2NewUrl {
         return res;
     }
 
-
-
-
-
-
-
     private static List<Audience_options> arrayOfAudience_options(System.JSONParser p) {
         List<Audience_options> res = new List<Audience_options>();
         if (p.getCurrentToken() == null) p.nextToken();
@@ -232,7 +220,4 @@ public class JSON2NewUrl {
         }
         return res;
     }
-
-
-
 }

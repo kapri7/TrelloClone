@@ -5,7 +5,6 @@
 import { LightningElement, track, wire, api } from "lwc";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import { CurrentPageReference } from "lightning/navigation";
-import getAllColumns from "@salesforce/apex/CardColumnController.getAllColumns";
 import insertNewColumn from "@salesforce/apex/CardColumnController.insertNewColumn";
 import deleteColumn from "@salesforce/apex/CardColumnController.deleteColumn";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";

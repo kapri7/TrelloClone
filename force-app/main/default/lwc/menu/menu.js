@@ -1,7 +1,6 @@
 import { LightningElement, track, wire, api } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
-import getAllLogItems from "@salesforce/apex/LogItemController.getAllLogItems";
 import insertNewLogItem from "@salesforce/apex/LogItemController.insertNewLogItem";
 import getCurrentUser from "@salesforce/apex/TrelloController.getCurrentUser";
 import Id from "@salesforce/user/Id";

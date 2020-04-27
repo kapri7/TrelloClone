@@ -3,14 +3,6 @@
  */
 
 public with sharing class DashboardController {
-    @AuraEnabled(Cacheable=true)
-    public static Dashboard__c[] getAllDashboards() {
-        return [
-                SELECT Id, Name,Description__c
-                FROM Dashboard__c
-                ORDER BY CreatedDate
-        ];
-    }
 
     @AuraEnabled
     public static Dashboard__c insertNewDashboard(Dashboard__c dashboard) {

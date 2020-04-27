@@ -5,7 +5,7 @@
 import { LightningElement, api, track, wire } from "lwc";
 import { CurrentPageReference } from "lightning/navigation";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
-import addGoogleFileCard from "@salesforce/apex/GoogleFileCardController.addGoogleFileCard";
+import addFileCard from "@salesforce/apex/FileCardController.addFileCard";
 
 class File {
   constructor(id, name, url) {
@@ -42,7 +42,7 @@ export default class StorageFileModal extends LightningElement {
       files.push(new File(file.documentId, file.name, "/sfc/servlet.shepherd/document/download/" + file.documentId));
     }
     console.log(files);
-    addGoogleFileCard({ files: JSON.stringify(files), cardId: this.myRecordId, fileSource: "Storage" })
+    addFileCard({ files: JSON.stringify(files), cardId: this.myRecordId, fileSource: "Storage" })
       .then(result => {
         let newFiles = [];
         for (let fileId of uploadedFiles) {

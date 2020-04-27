@@ -3,13 +3,10 @@
  */
 
 import { LightningElement, track, wire } from "lwc";
-import getAllLogItems from "@salesforce/apex/LogItemController.getAllLogItems";
 import deleteDashboard from "@salesforce/apex/DashboardController.deleteDashboard";
 import updateDashboard from "@salesforce/apex/DashboardController.updateDashboard";
 import getUserBoards from "@salesforce/apex/UserBoardController.getUserBoards";
 import getAllData from "@salesforce/apex/TrelloController.getAllData";
-import getGoogleFileCards from "@salesforce/apex/GoogleFileCardController.getGoogleFileCards";
-import getGoogleFiles from "@salesforce/apex/GoogleDriveController.getGoogleFiles";
 import { fireEvent, registerListener, unregisterAllListeners } from "c/pubsub";
 import Id from "@salesforce/user/Id";
 import { CurrentPageReference } from "lightning/navigation";
